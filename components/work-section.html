@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototype F — Editorial Monitor</title>
+
+<!-- ===== STANDALONE PREVIEW ONLY — do not paste into production ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Onest:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#04060d}</style>
+<!-- ===== /STANDALONE PREVIEW ONLY ===== -->
+
+<!-- ===== SECTION STYLES (paste) — the one scoped block; every selector under [data-vbwork2], every class vw2- ===== -->
+<style>
+[data-vbwork2]{position:relative;z-index:2;box-sizing:border-box;background:#04060d;overflow:clip;padding:clamp(90px,13vh,160px) clamp(20px,5vw,90px) clamp(80px,10vh,130px);font-family:'Onest',system-ui,sans-serif;color:#eaf0ff}
+[data-vbwork2] *,[data-vbwork2] *::before,[data-vbwork2] *::after{box-sizing:border-box}
+[data-vbwork2] button{margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-vbwork2] button:focus-visible{outline:2px solid #b6f500;outline-offset:3px}
+[data-vbwork2] img{display:block}
+[data-vbwork2] .vw2-wrap{max-width:1400px;margin:0 auto}
+[data-vbwork2] .vw2-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- header (site-wide pattern) ---------- */
+[data-vbwork2] .vw2-head{margin-bottom:0} /* the filter row's hairline is the list's top rule */
+[data-vbwork2] .vw2-head-top{display:grid;gap:16px;margin-bottom:8px}
+[data-vbwork2] .vw2-eyebrow{display:block;margin-bottom:18px;font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#b6f500}
+[data-vbwork2] .vw2-h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,3.7vw,54px);font-weight:600;line-height:1.05;letter-spacing:-.035em;color:#f6f9ff}
+[data-vbwork2] .vw2-accent{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;letter-spacing:-.01em;color:#b6f500}
+[data-vbwork2] .vw2-sub{margin:0 0 16px;max-width:380px;font-size:15px;line-height:1.6;color:#8da0c4}
+[data-vbwork2] .vw2-sub-d{display:none} /* the approved sentence talks about the monitor: only shown where the monitor exists */
+[data-vbwork2] .vw2-stats{display:flex;flex-wrap:wrap;gap:6px 0;margin:0}
+[data-vbwork2] .vw2-stats div{display:flex;align-items:baseline;gap:8px}
+[data-vbwork2] .vw2-stats div + div::before{content:"\00b7";order:-2;margin:0 6px;color:#8da0c4}
+[data-vbwork2] .vw2-stats dd{order:-1;margin:0;font:400 27px/1 'Instrument Serif',serif;font-style:italic;color:#f6f9ff}
+[data-vbwork2] .vw2-stats dt{font-size:13px;color:#8da0c4}
+/* filters: a line of small-caps words, not chips. The active word carries a 1px lime underline. */
+[data-vbwork2] .vw2-bar{border-bottom:1px solid rgba(255,255,255,.1)}
+[data-vbwork2] .vw2-filters{display:flex;flex-wrap:wrap;align-items:baseline}
+[data-vbwork2] .vw2-filt{display:inline-flex;align-items:baseline;padding:14px 0;font-size:12.5px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:#8da0c4} /* 16 + 28 = 44px tall */
+[data-vbwork2] .vw2-filt + .vw2-filt::before{content:"\00b7";margin:0 22px;color:#8da0c4}
+[data-vbwork2] .vw2-fl{display:inline-block;padding-bottom:5px;border-bottom:1px solid transparent}
+[data-vbwork2] .vw2-filt b{margin-left:5px;font:400 16px/1 'Instrument Serif',serif;font-style:italic;letter-spacing:0;color:inherit}
+[data-vbwork2] .vw2-filt[aria-pressed="true"]{color:#f6f9ff}
+[data-vbwork2] .vw2-filt[aria-pressed="true"] .vw2-fl{border-color:#b6f500}
+
+/* ---------- list: base = compact media rows (phone / tablet / short viewports) ---------- */
+[data-vbwork2] .vw2-list{list-style:none;margin:0;padding:0;transition:opacity .12s linear}
+[data-vbwork2] .vw2-list.vw2-out{opacity:0}
+/* li = mask + dim target, button = the thing that slides: entrance and dim never fight over one opacity */
+[data-vbwork2] .vw2-item{display:block;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.1);transition:opacity .35s ease}
+[data-vbwork2] .vw2-item[hidden]{display:none}
+[data-vbwork2] .vw2-row{position:relative;display:block;width:100%}
+[data-vbwork2] .vw2-row:focus-visible{outline-offset:-3px}
+[data-vbwork2] .vw2-grid{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:16px;row-gap:2px;align-items:start;min-height:88px;padding:16px 0}
+[data-vbwork2] .vw2-num{display:block;grid-column:2;grid-row:1;font:400 15px/1 'Instrument Serif',serif;font-style:italic;color:#8da0c4}
+[data-vbwork2] .vw2-thumb{position:relative;display:block;grid-column:1;grid-row:1 / span 2;width:96px;height:68px;border-radius:3px;overflow:hidden;background:#080d1a}
+[data-vbwork2] .vw2-thumb img,[data-vbwork2] .vw2-strip img{width:100%;height:100%;object-fit:cover}
+[data-vbwork2] .vw2-txt{display:block;grid-column:2;grid-row:2;min-width:0}
+[data-vbwork2] .vw2-title{display:block;font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,2vw,30px);font-weight:600;line-height:1.1;letter-spacing:-.025em;color:#f6f9ff;overflow-wrap:break-word;transition:opacity .15s ease}
+[data-vbwork2] .vw2-meta{display:block;margin-top:6px;font-size:14px;font-weight:400;line-height:1.4;color:#8da0c4}
+[data-vbwork2] .vw2-strip{display:none}
+[data-vbwork2] .vw2-strip i{display:block;width:84px;height:52px;border-radius:3px;overflow:hidden;background:#080d1a}
+/* one arrow, not thirteen: hidden until hover / press / the row on the frame; slides flush from 6px in (never past the li's clip edge) */
+[data-vbwork2] .vw2-arrow{display:none;align-items:center;justify-content:flex-end;width:30px;height:44px;color:#f6f9ff;opacity:0;transform:translateX(-6px);transition:opacity .3s ease,transform .5s cubic-bezier(.2,.7,.3,1)}
+[data-vbwork2] .vw2-arrow svg{width:18px;height:18px}
+/* pressed feedback (tap highlight is off, so a phone tap needs its own) */
+[data-vbwork2] .vw2-row:active .vw2-arrow{opacity:1;transform:translateX(0);transition-duration:.15s}
+[data-vbwork2] .vw2-row:active .vw2-title{opacity:.7}
+[data-vbwork2] .vw2-row.vw2-fin{animation:vw2-fin .12s ease backwards}
+@keyframes vw2-fin{from{opacity:0;transform:translateY(8px)}}
+[data-vbwork2] .vw2-mon{display:none}
+
+@media (hover:hover){
+  [data-vbwork2] .vw2-filt:hover{color:#f6f9ff}
+  [data-vbwork2] .vw2-row:hover .vw2-arrow{opacity:1;transform:translateX(0)}
+  [data-vbwork2] .vw2-open:hover .vw2-open-t{text-decoration-color:#b6f500}
+  [data-vbwork2] .vw2-open:hover svg{transform:translateX(4px)}
+}
+
+@media (min-width:520px){
+  [data-vbwork2] .vw2-head-top{gap:24px;margin-bottom:clamp(14px,2vw,28px)}
+  [data-vbwork2] .vw2-grid{grid-template-columns:48px 96px minmax(0,1fr) 30px;column-gap:18px;row-gap:0;align-items:center;padding:18px 0}
+  [data-vbwork2] .vw2-num{grid-column:1;grid-row:1 / span 2;font-size:20px}
+  [data-vbwork2] .vw2-thumb{grid-column:2;grid-row:1 / span 2}
+  [data-vbwork2] .vw2-txt{grid-column:3;grid-row:1 / span 2}
+  [data-vbwork2] .vw2-arrow{display:flex;grid-column:4;grid-row:1 / span 2}
+}
+/* tablet / short-desktop: three real frames in their own column, so the row's middle is never empty */
+@media (min-width:768px){
+  [data-vbwork2] .vw2-grid{grid-template-columns:48px 96px minmax(0,1fr) auto 30px}
+  [data-vbwork2] .vw2-strip{display:flex;gap:6px;grid-column:4;grid-row:1 / span 2}
+  [data-vbwork2] .vw2-strip:empty{display:none}
+  [data-vbwork2] .vw2-arrow{grid-column:5}
+}
+@media (min-width:900px){
+  /* anchored, not floating: the block's right edge is the content (and monitor) edge, its left edge is a drawn rule */
+  [data-vbwork2] .vw2-head-top{grid-template-columns:minmax(0,1fr) 380px;align-items:end;column-gap:clamp(28px,4vw,64px)}
+  [data-vbwork2] .vw2-head-r{padding-left:24px;border-left:1px solid rgba(255,255,255,.14)}
+  [data-vbwork2] .vw2-sub{max-width:none}
+}
+
+/* ---------- monitor (only ever displayed inside the desktop query below): one frame on the page, a caption under it ---------- */
+[data-vbwork2] .vw2-mon-in{position:relative}
+/* max-height keeps frame + caption inside the viewport (the still is cover-fit, so a shorter box is a tighter crop, never bands).
+   Budget: caption under the frame is <= 180px (2-line title), sticky top <= 121px whenever this clamp is the limit. */
+[data-vbwork2] .vw2-viewer{position:relative;display:block;width:100%;aspect-ratio:16/9;min-height:190px;max-height:calc(100vh - 320px);border-radius:4px;overflow:hidden;background:#080d1a;box-shadow:0 50px 80px -50px rgba(0,0,0,.9)}
+/* a hairline only: one clean still, no vignette, no ambient blur */
+[data-vbwork2] .vw2-viewer::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+[data-vbwork2] .vw2-main{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+/* portrait design frames sit whole on the flat ground; tall ones (shorts, emailers) are flanked by their neighbours at natural ratio, full strength */
+[data-vbwork2] .vw2-viewer.vw2-contain .vw2-main{object-fit:contain}
+[data-vbwork2] .vw2-side{display:none;position:absolute;top:9%;height:82%;width:auto;border-radius:3px}
+[data-vbwork2] .vw2-side-l{right:66%}
+[data-vbwork2] .vw2-side-r{left:66%}
+[data-vbwork2] .vw2-viewer.vw2-tall .vw2-side{display:block}
+[data-vbwork2] .vw2-viewer.vw2-blank img{opacity:0} /* project changed and its first frame is not decoded yet: cut to black, never a stale frame */
+[data-vbwork2] .vw2-flash{position:absolute;top:0;right:0;bottom:0;left:0;background:#fff;opacity:0;pointer-events:none}
+[data-vbwork2] .vw2-flash.vw2-go{animation:vw2-flash .22s linear}
+@keyframes vw2-flash{0%{opacity:0}35%{opacity:.16}100%{opacity:0}}
+[data-vbwork2] .vw2-cap{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:end;margin-top:22px}
+[data-vbwork2] .vw2-cap-l{min-width:0}
+[data-vbwork2] .vw2-cap-l.vw2-swap{animation:vw2-swap .3s cubic-bezier(.2,.7,.3,1)}
+@keyframes vw2-swap{from{opacity:0;transform:translateY(8px)}}
+[data-vbwork2] .vw2-cap-head{display:flex;align-items:baseline;gap:14px}
+[data-vbwork2] .vw2-cap-num{flex:none;font:400 clamp(26px,2.6vw,40px)/1 'Instrument Serif',serif;font-style:italic;color:#b6f500}
+[data-vbwork2] .vw2-cap-title{margin:0;min-width:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,2.6vw,40px);font-weight:600;line-height:1.08;letter-spacing:-.03em;color:#f6f9ff;overflow-wrap:break-word;text-wrap:balance}
+[data-vbwork2] .vw2-cap-meta{margin:8px 0 0;font-size:14px;font-weight:400;line-height:1.4;color:#8da0c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* one line always: the caption's bottom edge must not move between projects */
+/* plain text link: word, hairline underline, arrow that slides */
+[data-vbwork2] .vw2-open{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;line-height:1;white-space:nowrap;color:#f6f9ff}
+[data-vbwork2] .vw2-open-t{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px;text-decoration-color:rgba(246,249,255,.35)}
+[data-vbwork2] .vw2-open svg{flex:none;width:16px;height:16px;transition:transform .5s cubic-bezier(.2,.7,.3,1)}
+[data-vbwork2] .vw2-open:active svg{transform:translateX(4px)}
+
+/* ---------- DESKTOP: list left, docked monitor right. JS uses this exact query string. ---------- */
+@media (min-width: 1024px) and (min-height: 560px){
+  [data-vbwork2] .vw2-sub-d{display:inline}
+  [data-vbwork2] .vw2-sub-m{display:none}
+  [data-vbwork2] .vw2-body{display:grid;grid-template-columns:minmax(0,44fr) minmax(0,56fr);column-gap:clamp(28px,4vw,64px);align-items:start}
+  /* 96px clears the host header; taller screens centre the dock instead of leaving air under it. JS reads the computed top. */
+  [data-vbwork2] .vw2-mon{display:block;position:sticky;top:clamp(96px,calc((100vh - 760px) / 2 + 48px),200px);align-self:start;margin-top:25px} /* 22px row padding + the thumb's 3px: frame top registers with the first contact print */
+  /* register: numeral 30 > title 28 > count 14, one step each; the numeral leads the row */
+  [data-vbwork2] .vw2-grid{grid-template-columns:48px 112px minmax(0,1fr) 30px;column-gap:18px;align-items:start;padding:24px 0}
+  [data-vbwork2] .vw2-num{font-size:30px;padding-top:3px} /* sits on the title line, not mid-row */
+  [data-vbwork2] .vw2-thumb{width:112px;height:70px;margin-top:3px}
+  [data-vbwork2] .vw2-title{font-size:clamp(20px,1.9vw,28px)}
+  [data-vbwork2] .vw2-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  [data-vbwork2] .vw2-thumb img{transition:transform .6s cubic-bezier(.2,.7,.3,1)}
+  [data-vbwork2] .vw2-strip{display:none}
+  [data-vbwork2] .vw2-arrow{grid-column:4;align-self:center}
+  /* the playhead is the one row at full strength; the rest sit back a touch (muted text lifted so it still clears 4.5:1) */
+  [data-vbwork2] .vw2-item{opacity:.85}
+  [data-vbwork2] .vw2-item:not(.vw2-on) .vw2-meta,[data-vbwork2] .vw2-item:not(.vw2-on) .vw2-num{color:#c9d5ee}
+  [data-vbwork2] .vw2-item.vw2-on{opacity:1}
+  [data-vbwork2] .vw2-item.vw2-on .vw2-num{color:#b6f500}
+  [data-vbwork2] .vw2-item.vw2-on .vw2-thumb img{transform:scale(1.06)}
+  [data-vbwork2] .vw2-item.vw2-on .vw2-arrow{opacity:1;transform:translateX(0)}
+}
+/* narrow + tall desktop: 26px titles can wrap here, so reserve two lines and the caption never changes height */
+@media (min-width: 1024px) and (max-width: 1199px) and (min-height: 781px){
+  [data-vbwork2] .vw2-cap-l{min-height:calc(2.16 * clamp(26px,2.6vw,40px) + 28px)}
+}
+/* short desktop (1366x650, 1440x900 minus browser chrome): spend the height on the picture, not the caption */
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 780px){
+  [data-vbwork2] .vw2-cap-title,[data-vbwork2] .vw2-cap-num{font-size:26px}
+  [data-vbwork2] .vw2-viewer{max-height:calc(100vh - 260px)} /* 96 top + <=146 caption (2-line title) + 18 air */
+}
+@media (min-width: 1600px) and (min-height: 560px){
+  [data-vbwork2] .vw2-body{grid-template-columns:minmax(0,40fr) minmax(0,60fr)}
+}
+
+/* ---------- entrance (JS adds .vw2-anim only when IntersectionObserver exists and motion is allowed) ---------- */
+[data-vbwork2].vw2-anim .vw2-rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+[data-vbwork2].vw2-anim .vw2-d1{transition-delay:.08s}
+[data-vbwork2].vw2-anim .vw2-d2{transition-delay:.16s}
+[data-vbwork2].vw2-anim .vw2-in .vw2-rv,[data-vbwork2].vw2-anim .vw2-rv.vw2-in{opacity:1;transform:none}
+[data-vbwork2].vw2-anim .vw2-row{opacity:0;transform:translateY(24px);transition:transform .8s cubic-bezier(.2,.7,.3,1),opacity .7s cubic-bezier(.2,.7,.3,1)}
+[data-vbwork2].vw2-anim .vw2-row.vw2-in{opacity:1;transform:none}
+[data-vbwork2].vw2-anim .vw2-row.vw2-notrans{transition:none}
+[data-vbwork2].vw2-anim .vw2-mon-in{opacity:0;transform:scale(.97);transition:opacity .9s cubic-bezier(.2,.7,.3,1) .12s,transform .9s cubic-bezier(.2,.7,.3,1) .12s}
+[data-vbwork2].vw2-anim .vw2-mon-in.vw2-in{opacity:1;transform:none}
+@media (min-width: 1024px) and (min-height: 560px){
+  [data-vbwork2].vw2-anim .vw2-row{opacity:1;transform:translateY(105%)} /* masked slide-up only (no fade softening the mask edge): the li is the overflow:hidden line */
+  [data-vbwork2].vw2-anim .vw2-row.vw2-in{transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  [data-vbwork2] *,[data-vbwork2] *::before,[data-vbwork2] *::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- STANDALONE PREVIEW ONLY: fixture + a stub for the host's overlay opener -->
+<script src="_data.js"></script>
+<script>window.__vbOpenProject = window.__vbOpenProject || function (slug) { if (window.console) { console.log('[preview] __vbOpenProject', slug); } };</script>
+
+<!-- ===================== SECTION ROOT (paste) ===================== -->
+<section data-vbwork2 id="work" data-sec="work" data-screen-label="Selected Work" aria-labelledby="vw2-h">
+  <div class="vw2-wrap">
+    <header class="vw2-head">
+      <div class="vw2-head-top">
+        <div>
+          <span class="vw2-eyebrow vw2-rv">02 — The work</span>
+          <h2 class="vw2-h2" id="vw2-h"><span data-lines="1">Everything I've made,<br>cut into one <span class="vw2-accent">sequence.</span></span></h2>
+        </div>
+        <div class="vw2-head-r">
+          <p class="vw2-sub vw2-rv vw2-d1"><span class="vw2-sub-d">Scroll the list and the monitor cuts to each project. Open any one for the full set.</span><span class="vw2-sub-m">Open any project for the full set.</span></p>
+          <dl class="vw2-stats vw2-rv vw2-d2">
+            <div><dt>Projects</dt><dd data-vw2-n="projects"></dd></div>
+            <div><dt>Design pieces</dt><dd data-vw2-n="pieces"></dd></div>
+            <div><dt>Films</dt><dd data-vw2-n="films"></dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="vw2-bar vw2-rv">
+        <div class="vw2-filters" role="group" aria-label="Filter projects">
+          <button type="button" class="vw2-filt" data-f="all" aria-pressed="true"><span class="vw2-fl">All <b></b></span><span class="vw2-sr"> projects</span></button>
+          <button type="button" class="vw2-filt" data-f="film" aria-pressed="false"><span class="vw2-fl">Film <b></b></span><span class="vw2-sr"> projects</span></button>
+          <button type="button" class="vw2-filt" data-f="design" aria-pressed="false"><span class="vw2-fl">Design <b></b></span><span class="vw2-sr"> projects</span></button>
+        </div>
+        <p class="vw2-status vw2-sr" aria-live="polite"></p>
+      </div>
+    </header>
+
+    <div class="vw2-body">
+      <ol class="vw2-list" role="list"></ol>
+
+      <div class="vw2-mon">
+        <div class="vw2-mon-in">
+          <!-- mouse-only click target: the one keyboard / screen-reader control is "Open project" below -->
+          <button type="button" class="vw2-viewer" data-vw2="viewer" data-vw2-open data-cursor="Open" aria-hidden="true" tabindex="-1">
+            <img class="vw2-side vw2-side-l" data-vw2="sidel" alt="">
+            <img class="vw2-side vw2-side-r" data-vw2="sider" alt="">
+            <img class="vw2-main" data-vw2="main" alt="">
+            <span class="vw2-flash" data-vw2="flash"></span>
+          </button>
+          <div class="vw2-cap">
+            <div class="vw2-cap-l" data-vw2="capl">
+              <div class="vw2-cap-head"><span class="vw2-cap-num" data-vw2="num" aria-hidden="true"></span><h3 class="vw2-cap-title" data-vw2="title"></h3></div>
+              <p class="vw2-cap-meta" data-vw2="meta"></p>
+            </div>
+            <button type="button" class="vw2-open" data-vw2="open" data-vw2-open data-cursor="Open"><span class="vw2-open-t">Open project</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION SCRIPT (paste) — strict ES5, one IIFE, reads scroll position only (passive listener + rAF), never scrolls the page ===== -->
+<script>
+(function () {
+  'use strict';
+  var root = document.querySelector('[data-vbwork2]');
+  var WORK = window.VB_WORK;
+  if (!root || !WORK || !WORK.length) { return; }
+
+  var DESK = '(min-width: 1024px) and (min-height: 560px)';   // identical string in the CSS
+  var FEATURED = ['podcast-videos', 'social-media-designs', 'wealthy-yt-ads', 'creative-designs', 'trailer-video'];
+  var FLIP_MS = 950, INTENT_MS = 90, SETTLE_MS = 110, FOCUS_GRACE_MS = 400, HYST_PX = 14;
+  var ARROW = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+
+  function mq(s) { return window.matchMedia ? window.matchMedia(s) : { matches: false }; }
+  var mqDesk = mq(DESK), mqRed = mq('(prefers-reduced-motion: reduce)');   // .matches is read live, never cached
+
+  function q(name) { return root.querySelector('[data-vw2="' + name + '"]'); }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+  function imgs(p) { return p.images || []; }
+  function vids(p) { return p.videos || []; }
+  function countLabel(p) {
+    var a = [];
+    if (imgs(p).length) { a.push(plural(imgs(p).length, 'piece', 'pieces')); }
+    if (vids(p).length) { a.push(plural(vids(p).length, 'film', 'films')); }
+    return a.join(' · ');
+  }
+  function kindOf(p) { return imgs(p).length && vids(p).length ? 'mix' : (vids(p).length ? 'film' : 'design'); }
+  function kindLabel(p) { var k = kindOf(p); return k === 'mix' ? 'Design + film' : (k === 'film' ? 'Film' : 'Design'); }
+  function metaLabel(p) { return countLabel(p) || kindLabel(p); }   // "8 films", "1 piece · 2 films"; the kind word only when there is nothing to count
+  function posters(p) {   // playlist order; ids without a poster are skipped
+    var out = [], v = vids(p), i;
+    for (i = 0; i < v.length; i++) { if (p.posters && p.posters[v[i]]) { out.push(p.posters[v[i]]); } }
+    return out;
+  }
+  // ponytail: a design project with a single frame is, in this fixture, one long Behance strip (91-132px wide at 760 tall):
+  // a sliver in the viewer and a meaningless crop as a thumb. Those projects use the loud 808x632 cover instead.
+  // Upgrade path: ship frame width/height in the fixture and test the ratio instead of the count.
+  function stills(p) {
+    var f = p.frames || [];
+    return f.length >= 2 ? f : (imgs(p).length && p.cover ? [p.cover] : f);
+  }
+  function framesOf(p) {  // film -> cover then posters (the designed key art leads, not a letterboxed still), design -> frames, mixed -> frames then posters, nothing -> cover
+    var lead = kindOf(p) === 'film' && p.cover ? [p.cover] : [];
+    var out = lead.concat(stills(p), posters(p));
+    return out.length ? out : [p.cover];
+  }
+  function thumbOf(p) { return framesOf(p)[0]; }   // the row thumb is the frame the monitor opens on
+  function usable(p) { return !!framesOf(p)[0]; }   // no cover, no frames, no posters: nothing to show, so no row
+  function matchesFilter(p, f) {   // a mixed project matches both
+    return f === 'all' || (f === 'film' && vids(p).length > 0) || (f === 'design' && imgs(p).length > 0);
+  }
+  function clamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+  /* ---------- curated order ---------- */
+  var bySlug = {}, ORDER = [], FR = [], idxOf = {}, totals = { projects: WORK.length, pieces: 0, films: 0 }, i, p;
+  for (i = 0; i < WORK.length; i++) { bySlug[WORK[i].slug] = WORK[i]; totals.pieces += imgs(WORK[i]).length; totals.films += vids(WORK[i]).length; }
+  for (i = 0; i < FEATURED.length; i++) { p = bySlug[FEATURED[i]]; if (p && usable(p)) { ORDER.push(p); } }
+  for (i = 0; i < WORK.length; i++) { if (ORDER.indexOf(WORK[i]) < 0 && usable(WORK[i])) { ORDER.push(WORK[i]); } }
+  if (!ORDER.length) { return; }
+  for (i = 0; i < ORDER.length; i++) { idxOf[ORDER[i].slug] = i; FR[i] = framesOf(ORDER[i]); }
+
+  /* ---------- build ---------- */
+  function img(src) { return '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async">'; }
+  function rowHTML(p, n) {
+    var ps = FR[n].slice(1, 4), strip = '', j;   // frame 0 is (or stands in for) the thumb; the tablet strip shows the next three
+    for (j = 0; j < ps.length; j++) { strip += '<i>' + img(ps[j]) + '</i>'; }
+    // aria-label stays "Open <title>" (host contract); kind + count reach screen readers as the description
+    return '<li class="vw2-item"><button type="button" class="vw2-row" data-slug="' + esc(p.slug) + '" data-cursor="Open" aria-label="Open ' + esc(p.title) + '" aria-describedby="vw2-m-' + n + '">' +
+      '<span class="vw2-grid">' +
+        '<span class="vw2-num">' + pad2(n + 1) + '</span>' +
+        '<span class="vw2-thumb">' + img(thumbOf(p)) + '</span>' +
+        '<span class="vw2-txt"><span class="vw2-title">' + esc(p.title) + '</span>' +
+          '<span class="vw2-meta" id="vw2-m-' + n + '">' + esc(metaLabel(p)) + '</span>' +
+        '</span>' +
+        '<span class="vw2-strip">' + strip + '</span>' +
+        '<span class="vw2-arrow">' + ARROW + '</span>' +
+      '</span></button></li>';
+  }
+
+  var list = root.querySelector('.vw2-list');
+  var statusEl = root.querySelector('.vw2-status');
+  var filts = root.querySelectorAll('.vw2-filt');
+  var el = { mon: root.querySelector('.vw2-mon'), monIn: root.querySelector('.vw2-mon-in'), viewer: q('viewer'),
+    main: q('main'), sideL: q('sidel'), sideR: q('sider'), flash: q('flash'), capl: q('capl'), num: q('num'),
+    title: q('title'), meta: q('meta'), open: q('open') };
+  var hasIO = 'IntersectionObserver' in window;
+  var animate = hasIO && !mqRed.matches;
+  if (animate) { root.classList.add('vw2-anim'); }
+
+  var html = '';
+  for (i = 0; i < ORDER.length; i++) { html += rowHTML(ORDER[i], i); }
+  list.innerHTML = html;
+  var items = list.children;
+
+  var nEls = root.querySelectorAll('[data-vw2-n]');
+  for (i = 0; i < nEls.length; i++) { nEls[i].textContent = totals[nEls[i].getAttribute('data-vw2-n')]; }
+
+  /* ---------- self-checks (dev aid; silent when healthy) ---------- */
+  if (window.console && console.assert) {
+    console.assert(countLabel({ images: new Array(12), videos: [] }) === '12 pieces', 'vw2: countLabel plural pieces');
+    console.assert(countLabel({ images: [1], videos: [] }) === '1 piece', 'vw2: countLabel singular piece');
+    console.assert(countLabel({ images: [], videos: new Array(8) }) === '8 films', 'vw2: countLabel films');
+    console.assert(metaLabel({ images: [1], videos: [1, 2] }) === '1 piece · 2 films', 'vw2: metaLabel mixed needs both halves');
+    console.assert(metaLabel({ images: [], videos: [], cover: 'c' }) === 'Design', 'vw2: metaLabel with nothing to count is the kind alone');
+    console.assert(framesOf({ images: [1], frames: ['strip'], cover: 'c', videos: [] })[0] === 'c', 'vw2: a lone strip frame must fall back to the cover');
+    console.assert(framesOf({ images: [], videos: ['a'], posters: { a: 'p' }, cover: 'c' }).join() === 'c,p', 'vw2: film frames lead with the cover, then posters');
+    (function () {
+      var seen = {}, n = 0, rows = list.querySelectorAll('.vw2-row'), j, s;
+      for (j = 0; j < rows.length; j++) { s = rows[j].getAttribute('data-slug'); if (!seen[s]) { seen[s] = 1; n++; } }
+      console.assert(n === WORK.length && rows.length === WORK.length, 'vw2: expected ' + WORK.length + ' unique slugs rendered, got ' + n);
+    })();
+  }
+
+  /* ---------- monitor: race-safe hard cuts ---------- */
+  // markSlug = the highlighted row (tracks its source immediately); activeSlug = the project loaded in the monitor.
+  var activeSlug = null, markSlug = null, curF = 0, token = 0, pendingCut = false, flipTimer = 0, visible = !hasIO;
+  var stickyTop = 96, monH = 0;
+  var preload = new Image();
+
+  function canPlay() { return visible && !document.hidden && !mqRed.matches && mqDesk.matches; }
+  function show(src, k, im) {
+    var tk = token, fr = FR[idxOf[activeSlug]], n = fr.length;
+    // landscape fills the 16:9 frame edge to edge; portrait sits whole on the ground; tall (9:16-ish) gets its neighbours as flanks
+    var portrait = !!im && im.naturalHeight > im.naturalWidth * 0.75;
+    var tall = portrait && n >= 3 && im.naturalHeight > im.naturalWidth * 1.5;
+    // un-blank only once the ON-SCREEN img holds the new frame (Safari can keep painting the old request for a frame or two)
+    function unblank() { if (tk === token) { el.viewer.classList.remove('vw2-blank'); } }
+    el.main.onload = unblank;
+    el.main.setAttribute('src', src);
+    el.viewer.classList[portrait ? 'add' : 'remove']('vw2-contain');
+    if (tall) {   // previous / next frame flank a tall one; both are already cached or preloading
+      el.sideL.setAttribute('src', fr[(k + n - 1) % n]);
+      el.sideR.setAttribute('src', fr[(k + 1) % n]);
+      el.viewer.classList.add('vw2-tall');
+    } else {
+      el.viewer.classList.remove('vw2-tall');
+    }
+    if (el.main.complete && el.main.naturalWidth && el.main.currentSrc === el.main.src) { unblank(); }
+  }
+  // Load first, cut second. Every call takes a new token, so a slow image from a project the user
+  // already swept past can never land on screen (same idea as a-timeline's swap).
+  function cut(src, k, after) {
+    var tk = ++token, im = new Image(), done = false;
+    pendingCut = true;
+    function go(ok) {
+      if (done) { return; }
+      done = true;
+      if (tk !== token) { return; }
+      pendingCut = false;
+      if (ok) { show(src, k, im); }
+      after(ok);
+    }
+    im.onload = function () { go(true); };
+    im.onerror = function () { go(false); };
+    im.src = src;
+    if (im.complete && im.naturalWidth) { go(true); }
+  }
+  function schedule() {
+    clearTimeout(flipTimer); flipTimer = 0;
+    var fr = activeSlug === null ? null : FR[idxOf[activeSlug]];
+    if (!fr || fr.length < 2 || !canPlay()) { return; }
+    preload.src = fr[(curF + 1) % fr.length];   // warm the next frame so the cut lands on time
+    flipTimer = setTimeout(step, FLIP_MS);
+  }
+  function step() {
+    flipTimer = 0;
+    if (activeSlug === null || !canPlay()) { return; }
+    var fr = FR[idxOf[activeSlug]], n = (curF + 1) % fr.length;
+    cut(fr[n], n, function (ok) {
+      if (ok) { curF = n; }
+      else { fr.splice(n, 1); if (n < curF) { curF--; } }   // a broken frame leaves the loop for good: no 1/s re-request of a 404
+      schedule();                                            // stops by itself once fewer than 2 frames are left
+    });
+  }
+  // resume / pause the flipbook; safe to call as often as you like
+  function sync() {
+    if (!canPlay()) { clearTimeout(flipTimer); flipTimer = 0; return; }
+    if (!flipTimer && !pendingCut) { schedule(); }
+  }
+  // restart one or two CSS animations with a single forced reflow
+  function replay(a, ca, b, cb) {
+    a.classList.remove(ca);
+    if (b) { b.classList.remove(cb); }
+    void a.offsetWidth;
+    a.classList.add(ca);
+    if (b) { b.classList.add(cb); }
+  }
+  // layout numbers that only change with the viewport: read once here, never per scrolled frame
+  function measure() {
+    var t = window.getComputedStyle ? parseFloat(window.getComputedStyle(el.mon).top) : NaN;   // 'auto' while the monitor is display:none
+    stickyTop = t > 0 ? t : 96;
+    monH = 0;
+  }
+
+  function mark(slug) {   // cheap: the row at full strength
+    if (slug === markSlug) { return; }
+    if (markSlug !== null) { items[idxOf[markSlug]].classList.remove('vw2-on'); }
+    items[idxOf[slug]].classList.add('vw2-on');
+    markSlug = slug;
+  }
+  function load(slug) {   // expensive: flash, blackout, caption swap, image request
+    var had = activeSlug !== null, n = idxOf[slug], pr = ORDER[n];
+    activeSlug = slug; curF = 0;
+    el.num.textContent = pad2(n + 1);
+    el.title.textContent = pr.title;
+    el.meta.textContent = metaLabel(pr);
+    el.viewer.setAttribute('aria-label', 'Open ' + pr.title);
+    el.open.setAttribute('aria-label', 'Open project: ' + pr.title);   // keeps the visible words inside the accessible name
+    clearTimeout(flipTimer); flipTimer = 0;
+    el.viewer.classList.add('vw2-blank');
+    if (had && !mqRed.matches) { replay(el.flash, 'vw2-go', el.capl, 'vw2-swap'); }
+    cut(FR[n][0], 0, function (ok) { if (!ok && pr.cover) { show(pr.cover, 0, null); } schedule(); });
+  }
+
+  /* ---------- activation: keyboard focus > pointer (90ms intent) > scroll position ---------- */
+  var focusSlug = null, hoverSlug = null, pendSlug = null, scrollSlug = ORDER[0].slug, pendLoad = null;
+  var hoverTimer = 0, settleT = 0, lastScroll = 0, focusAt = 0, lastX = -1, lastY = -1, kb = false, raf = 0;
+
+  function firstShown() { for (var j = 0; j < items.length; j++) { if (!items[j].hidden) { return ORDER[j].slug; } } return null; }
+  function shown(s) { return s && !items[idxOf[s]].hidden ? s : null; }
+  // Focus and hover load the monitor at once. The scroll source marks its row at once but only loads the monitor after the
+  // candidate has held for SETTLE_MS: a Page Down / fling sweeps the highlight down the list without strobing 12 projects
+  // (flash + blackout + image request each) through a 600px viewer. now=true skips the wait (filter swap, settle commit).
+  function resolve(now) {
+    if (!mqDesk.matches) { return; }   // no monitor below the desktop query: load nothing, mark nothing
+    var direct = shown(focusSlug) || shown(hoverSlug), s = direct || shown(scrollSlug) || firstShown();
+    if (!s) {   // a filter that matches nothing: never leave a hidden project on the monitor
+      clearTimeout(settleT); clearTimeout(flipTimer); flipTimer = 0; pendLoad = null;
+      if (activeSlug !== null) { token++; pendingCut = false; activeSlug = null; el.viewer.classList.add('vw2-blank'); }
+      return;
+    }
+    mark(s);
+    if (s === activeSlug) { clearTimeout(settleT); pendLoad = null; return; }
+    if (direct || now === true || activeSlug === null) { clearTimeout(settleT); pendLoad = null; load(s); return; }
+    if (s !== pendLoad) { pendLoad = s; clearTimeout(settleT); settleT = setTimeout(commit, SETTLE_MS); }
+  }
+  function commit() { pendLoad = null; resolve(true); }
+  // The playhead line is the row level with the top of the frame (at rest that is row 01, so the frame never
+  // contradicts the eye starting at the top of the list; once docked it sits just under the sticky top), capped
+  // at 45% of the viewport, and eases down to the monitor's bottom edge as the list runs out, so the last rows
+  // still get their turn while the sticky monitor is fully docked.
+  // monH only ever grows between resizes, and a new row must beat the current one by HYST_PX: the monitor's own
+  // height can no longer feed back into the line and make two neighbouring rows alternate.
+  // ponytail: reads 13 rects per scrolled frame; cache offsets if the list ever grows past ~50 rows.
+  function computeScroll() {
+    var vh = window.innerHeight, lr = list.getBoundingClientRect(), base = Math.min(vh * 0.45, el.mon.getBoundingClientRect().top + 56);   // 56 = half a row
+    monH = Math.max(monH, el.mon.offsetHeight);
+    var need = Math.min(stickyTop + monH, vh * 0.9), span = lr.height - (need - base), line = base;
+    var best = null, bestD = 1e9, curD = -1, j, r, d;
+    if (need > base && span > 0) { line = base + clamp01((base - lr.top) / span) * (need - base); }
+    for (j = 0; j < items.length; j++) {
+      if (items[j].hidden) { continue; }
+      r = items[j].getBoundingClientRect();
+      d = Math.abs((r.top + r.bottom) / 2 - line);
+      if (ORDER[j].slug === scrollSlug) { curD = d; }
+      if (d < bestD) { bestD = d; best = ORDER[j].slug; }
+    }
+    if (best && (curD < 0 || curD - bestD > HYST_PX)) { scrollSlug = best; }
+  }
+  function tick() {
+    raf = 0;
+    if (!visible || !mqDesk.matches) { sync(); return; }
+    computeScroll();
+    resolve();      // touches the DOM only when the marked / loaded slug really changed
+    sync();
+  }
+  function kick() { if (!raf) { raf = window.requestAnimationFrame(tick); } }
+  function dropHover() { clearTimeout(hoverTimer); hoverSlug = null; pendSlug = null; }
+
+  function slugFrom(t) {
+    while (t && t !== root) {
+      if (t.getAttribute && t.getAttribute('data-slug')) { return t.getAttribute('data-slug'); }
+      t = t.parentNode;
+    }
+    return null;
+  }
+  // Only real pointer travel counts: browsers fire a synthetic mousemove after a scroll (same coordinates),
+  // which would otherwise make hover and scroll fight each other while the host is still easing the page.
+  function onMove(e) {
+    if (!mqDesk.matches || (e.clientX === lastX && e.clientY === lastY)) { return; }
+    lastX = e.clientX; lastY = e.clientY;
+    if (focusSlug !== null) { focusSlug = null; kick(); }   // real pointer input releases the keyboard-focus claim
+    var s = slugFrom(e.target);
+    if (s === pendSlug) { return; }
+    clearTimeout(hoverTimer);
+    pendSlug = s;
+    if (!s) { return; }
+    hoverTimer = setTimeout(function () {
+      if (Date.now() - lastScroll < 140) { pendSlug = null; return; }   // page still moving: scroll stays in charge
+      hoverSlug = s;
+      resolve();
+    }, INTENT_MS);
+  }
+  // Leaving cancels a pending intent. The project already on the monitor stays put until the next scroll,
+  // so crossing the gutter to press "Open project" never swaps the project out from under the cursor.
+  function onLeave() { clearTimeout(hoverTimer); pendSlug = null; }
+  list.addEventListener('mousemove', onMove);
+  list.addEventListener('mouseleave', onLeave);
+
+  root.addEventListener('keydown', function () { kb = true; });
+  root.addEventListener('mousedown', function () { kb = false; });
+  root.addEventListener('focusin', function (e) {
+    var s = slugFrom(e.target), viaKeys = false;
+    if (s) {
+      try { viaKeys = e.target.matches(':focus-visible'); } catch (err) { viaKeys = kb; }
+      focusSlug = viaKeys ? s : null;
+      focusAt = Date.now();
+    } else if (!el.mon.contains(e.target)) {
+      focusSlug = null;   // focus moving from a row into the monitor keeps that row's project loaded
+    }
+    resolve();
+  });
+  root.addEventListener('focusout', function (e) {
+    if (!e.relatedTarget || !root.contains(e.relatedTarget)) { focusSlug = null; resolve(); }
+  });
+
+  window.addEventListener('scroll', function () {
+    if (!visible || !mqDesk.matches) { return; }   // off-screen or no monitor: not even a rAF
+    lastScroll = Date.now();
+    // Focus priority is temporary. The grace lets the browser's own scroll-into-view after a Tab finish; any later
+    // scroll (arrows, Page Down, trackpad, the host's eased scroll) hands the monitor back to the scroll position.
+    if (focusSlug !== null && lastScroll - focusAt > FOCUS_GRACE_MS) { focusSlug = null; }
+    if (hoverSlug !== null || pendSlug !== null) { dropHover(); }
+    kick();
+  }, { passive: true });
+  window.addEventListener('resize', function () { measure(); kick(); });
+  document.addEventListener('visibilitychange', sync);
+
+  /* ---------- open: rows, the frame and the text link — always one step ---------- */
+  root.addEventListener('click', function (e) {
+    var t = e.target, s = null;
+    while (t && t !== root && !s) {
+      if (t.getAttribute) { s = t.getAttribute('data-slug') || (t.hasAttribute('data-vw2-open') ? activeSlug : null); }
+      t = t.parentNode;
+    }
+    if (s && typeof window.__vbOpenProject === 'function') { window.__vbOpenProject(s); }
+  });
+
+  /* ---------- filter: 120ms out, swap [hidden], <=180ms in ---------- */
+  var current = 'all', swapTimer = 0, enterIO = null, monIO = null, firstBatch = true;
+  function countFor(f) { var n = 0, j; for (j = 0; j < ORDER.length; j++) { if (matchesFilter(ORDER[j], f)) { n++; } } return n; }
+  function setStatus() { if (statusEl) { statusEl.textContent = 'Showing ' + countFor(current) + ' of ' + ORDER.length + ' projects'; } }   // screen readers only
+  function swap() {
+    var j, row, k = 0;
+    for (j = 0; j < items.length; j++) {
+      row = items[j].firstChild;
+      items[j].hidden = !matchesFilter(ORDER[j], current);
+      row.classList.add('vw2-notrans');      // rows that never played their entrance just appear: no .8s rise inside a 300ms budget
+      row.classList.add('vw2-in');
+      row.classList.remove('vw2-fin');
+      row.style.transitionDelay = '';
+    }
+    void list.offsetWidth;
+    for (j = 0; j < items.length; j++) {
+      row = items[j].firstChild;
+      row.classList.remove('vw2-notrans');
+      if (items[j].hidden) { continue; }
+      row.style.animationDelay = (Math.min(k, 5) * 12) + 'ms';   // 60ms of stagger + 120ms fade = 180ms
+      row.classList.add('vw2-fin');
+      k++;
+    }
+    list.classList.remove('vw2-out');
+    setStatus();
+    dropHover();
+    if (mqDesk.matches) { computeScroll(); }
+    resolve(true);
+  }
+  function applyFilter(f) {
+    var j;
+    if (f === current) { if (f === 'all') { return; } f = 'all'; }   // a pressed toggle releases back to All
+    current = f;
+    for (j = 0; j < filts.length; j++) { filts[j].setAttribute('aria-pressed', filts[j].getAttribute('data-f') === f ? 'true' : 'false'); }
+    clearTimeout(swapTimer);
+    if (mqRed.matches) { swap(); return; }
+    list.classList.add('vw2-out');
+    // ponytail: the list simply gets shorter; the filter line sits above it, so nothing the user is looking at moves.
+    swapTimer = setTimeout(swap, 120);
+  }
+  for (i = 0; i < filts.length; i++) {
+    filts[i].querySelector('b').textContent = countFor(filts[i].getAttribute('data-f'));
+    filts[i].addEventListener('click', function () { applyFilter(this.getAttribute('data-f')); });
+  }
+  setStatus();
+
+  /* ---------- observers: pause everything off-screen; one-shot entrances ---------- */
+  if (hasIO) {
+    new IntersectionObserver(function (es) {
+      visible = es[es.length - 1].isIntersecting;
+      if (visible) { kick(); } else { sync(); }
+    }, { rootMargin: '150px 0px 150px 0px' }).observe(root);
+  }
+  if (animate) {
+    enterIO = new IntersectionObserver(function (es) {
+      var k = firstBatch && mqDesk.matches ? 2 : 0, rows = 0, j, t, row;   // on desktop the monitor lands first, the list cascades after it
+      for (j = 0; j < es.length; j++) {
+        if (!es[j].isIntersecting) { continue; }
+        t = es[j].target;
+        enterIO.unobserve(t);
+        if (t.parentNode === list) {
+          row = t.firstChild;
+          rows++;
+          if (!row.classList.contains('vw2-in')) { row.style.transitionDelay = (k * 60) + 'ms'; row.classList.add('vw2-in'); k++; }
+        } else {
+          t.classList.add('vw2-in');
+        }
+      }
+      if (rows) { firstBatch = false; }
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.01 });
+    enterIO.observe(root.querySelector('.vw2-head-top'));   // each block triggers on its own: nothing finishes below the fold
+    enterIO.observe(root.querySelector('.vw2-bar'));
+    for (i = 0; i < items.length; i++) { enterIO.observe(items[i]); }
+    // the monitor waits until a third of it is on screen, then "powers on" with the same exposure flash the cuts use
+    monIO = new IntersectionObserver(function (es) {
+      for (var j = 0; j < es.length; j++) {
+        if (!es[j].isIntersecting) { continue; }
+        monIO.disconnect();
+        el.monIn.classList.add('vw2-in');
+        setTimeout(function () { if (!mqRed.matches && activeSlug !== null) { replay(el.flash, 'vw2-go'); } }, 650);
+        return;
+      }
+    }, { threshold: 0.35 });
+    monIO.observe(el.monIn);
+  }
+
+  measure();
+  resolve();   // first row is loaded from the start: the monitor is never empty
+  kick();
+})();
+</script>
+<!-- ===================== /SECTION (paste to here) ===================== -->
+
+<!-- STANDALONE PREVIEW ONLY: spacer so the sticky monitor can release and scroll away -->
+<div style="min-height:80vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px 0;color:#8da0c4;font:500 13px Onest,system-ui,sans-serif">preview spacer — next section</div>
+</body>
+</html>

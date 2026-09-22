@@ -1,0 +1,382 @@
+{
+  "profile": {
+    "name": "Vikas Banjare",
+    "role": "Design Studio Lead",
+    "company": "Mirae Asset Capital Markets",
+    "location": "Mumbai, India",
+    "availability": "Available for Freelance & Fulltime",
+    "email": "hello@example.com",
+    "phone": "Add your number",
+    "linkedin": "#",
+    "behance": "https://www.behance.net/vikas-banjare"
+  },
+  "projects": [
+    {
+      "id": "255679657",
+      "slug": "logo-designs",
+      "behanceSlug": "Logo-Designs",
+      "title": "Logo Designs",
+      "tags": [
+        "Logo Design",
+        "Illustrator"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/dbb782255679657.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/2800_webp/fdda40255679657.6aa7a62c27e91.png"
+      ],
+      "videos": [],
+      "posters": {}
+    },
+    {
+      "id": "255679453",
+      "slug": "bazaar-beyond-logo",
+      "behanceSlug": "Bazaar-Beyond-Logo-Redesign",
+      "title": "Bazaar & Beyond Logo",
+      "tags": [
+        "Logo Design",
+        "Branding"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0358a7255679453.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/2800_webp/7954f1255679453.6aa7a47d46282.png"
+      ],
+      "videos": [
+        "B_VI_yIeqbt",
+        "-bwq7EwgwxS"
+      ],
+      "posters": {
+        "B_VI_yIeqbt": "assets/posters/B_VI_yIeqbt.jpg",
+        "-bwq7EwgwxS": "assets/posters/-bwq7EwgwxS.jpg"
+      }
+    },
+    {
+      "id": "250526649",
+      "slug": "creative-designs",
+      "title": "Creative Designs",
+      "tags": [
+        "Graphic Design",
+        "Illustration"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/e4d6b5250526649.Y3JvcCwxMzkxLDEwODgsMCwyMA.png",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/7595bd250526649.6aa62e0d91724.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/a9f55a250526649.6aa62e0d91d65.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/2f0179250526649.6aa62e0d9104e.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/d7779c250526649.6a213678acf96.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/2dac9e250526649.6a213678ad58d.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/4cdf5d250526649.6a2136793a22f.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/20b0b7250526649.6a2136793a6ac.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/9cf036250526649.6a213679cd7c1.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8dca4b250526649.6a213679cd340.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/4329aa250526649.6a21367a63b3c.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/66dd5f250526649.6a21367a64336.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/82c54a250526649.6a21367af0132.jpg"
+      ],
+      "videos": [],
+      "behanceSlug": "Creative-Designs",
+      "posters": {}
+    },
+    {
+      "id": "250525969",
+      "slug": "emailer-design",
+      "title": "Emailer Design",
+      "tags": [
+        "Graphic Design",
+        "Illustration"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/6dfcb4250525969.Y3JvcCwxMzA3LDEwMjMsMTE2LDA.png",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/286ec4250525969.6a213368cf3d7.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/5262da250525969.6a213368cfefa.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/f63e0e250525969.6a213368d03cf.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8c71d4250525969.6a213368cf99f.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1c15df250525969.6a21336968a48.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/6e0e16250525969.6a21336969599.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8d6255250525969.6a2133696a058.png"
+      ],
+      "videos": [],
+      "behanceSlug": "Emailer-Design",
+      "posters": {}
+    },
+    {
+      "id": "232940741",
+      "slug": "ai-videos",
+      "title": "AI Videos",
+      "tags": [
+        "Motion Graphics"
+      ],
+      "kind": "video",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/78be36232940741.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [],
+      "videos": [
+        "QjLzVh5qDWs",
+        "6tYhpwyc8Ez",
+        "6jTpX5dmhI4",
+        "WAvhuYnWdDj"
+      ],
+      "behanceSlug": "AI-Videos",
+      "posters": {
+        "QjLzVh5qDWs": "assets/posters/QjLzVh5qDWs.jpg",
+        "6tYhpwyc8Ez": "assets/posters/6tYhpwyc8Ez.jpg",
+        "6jTpX5dmhI4": "assets/posters/6jTpX5dmhI4.jpg",
+        "WAvhuYnWdDj": "assets/posters/WAvhuYnWdDj.jpg"
+      }
+    },
+    {
+      "id": "232938571",
+      "slug": "ai-yt-thumbnails",
+      "title": "AI YT Thumbnails",
+      "tags": [
+        "Graphic Design",
+        "Illustration"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/bf2d32232938571.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/94839e232938571.6a213127a3946.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/00556b232938571.6a213127a421e.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/f83e70232938571.6a213127a4b67.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/a6d3ee232938571.6a21312839c0e.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/a594ff232938571.6a2131283a500.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/1a51d9232938571.6a2131283a0b9.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4e2160232938571.68a60e825fa23.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/119d4f232938571.68a60e825f3a7.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/b05421232938571.68a60e825e714.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/cc00fa232938571.68a60e825ed67.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/32e6a4232938571.68a60e825e089.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e46d4e232938571.6a098fca1cca0.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/9b2641232938571.6a098fca1bc3f.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/946d90232938571.6a098fca1d323.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/724298232938571.6a098fca1da2c.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8eeb04232938571.6a098fca1c500.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/a031cf232938571.6a098fca9f8aa.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/40c048232938571.6a098fcaa0156.jpg"
+      ],
+      "videos": [],
+      "behanceSlug": "AI-YT-Thumbnails-design",
+      "posters": {}
+    },
+    {
+      "id": "232522589",
+      "slug": "wealthy-yt-ads",
+      "title": "Wealthy YT Ads",
+      "tags": [
+        "Advertising"
+      ],
+      "kind": "video",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/872f31232522589.Y3JvcCwxNDE3LDExMDksMCww.png",
+      "images": [],
+      "videos": [
+        "Ue5FrWQ22dv",
+        "It7qHBhrcqT",
+        "JNLiwdqkjxh",
+        "RuDvkBsfa-S"
+      ],
+      "behanceSlug": "Wealthy-YT-Ads-CAMPAIGN-Videos",
+      "posters": {
+        "Ue5FrWQ22dv": "assets/posters/Ue5FrWQ22dv.jpg",
+        "It7qHBhrcqT": "assets/posters/It7qHBhrcqT.jpg",
+        "JNLiwdqkjxh": "assets/posters/JNLiwdqkjxh.jpg",
+        "RuDvkBsfa-S": "assets/posters/RuDvkBsfa-S.jpg"
+      }
+    },
+    {
+      "id": "218001529",
+      "slug": "social-media-designs",
+      "title": "Social Media Designs",
+      "tags": [
+        "Graphic Design",
+        "Illustration"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/b0e3fb218001529.Y3JvcCwxNTE3LDExODcsMjQ0LDE1NA.png",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/029dfd218001529.6aa62e74585eb.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/ccf80f218001529.6aa62e74579e6.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1cbfa1218001529.6aa62e7457ff3.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/6bed47218001529.6aa62f3e1b70c.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/a65dcc218001529.6aa62f3e1b372.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/fa65cc218001529.679a1a60dfdf4.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/51c454218001529.679a1a60de65d.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/3a2999218001529.679a1a60de242.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8068e4218001529.679a1a60df2e5.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/062ef8218001529.679a1a60db25b.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8c7e9a218001529.679a1a60dcfc7.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1c6896218001529.679b03a7a5d3e.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/c2c767218001529.679b03a7a69e7.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/f4aa64218001529.679b03a7a6e62.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/a88eb7218001529.679a1a60e0482.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/81db32218001529.679b03a7a63cd.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8d6fd3218001529.679a1a60deaa5.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/9e47c0218001529.679a1a60dc8eb.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/c083f4218001529.679a1a60ddb7b.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/6b0bb4218001529.679a1a60df9a9.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/0be5a1218001529.679a1a60dc1d3.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/dae5d3218001529.679b03a7a7468.jpeg"
+      ],
+      "videos": [],
+      "behanceSlug": "Social-Media-Designs",
+      "posters": {}
+    },
+    {
+      "id": "218001379",
+      "slug": "podcast-videos",
+      "title": "Podcast Videos",
+      "tags": [
+        "Advertising"
+      ],
+      "kind": "video",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/6b02e1218001379.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [],
+      "videos": [
+        "Das-7sT7kKS",
+        "UbDb6YabkWw",
+        "Md9LPtLoSyV",
+        "FuBTenaiTqv",
+        "Em7TeX2SqTn",
+        "R94zxhnXTCH",
+        "-KFeN_snxTq",
+        "BRhmJWXUvQd"
+      ],
+      "behanceSlug": "Podcast-Videos",
+      "posters": {
+        "Das-7sT7kKS": "assets/posters/Das-7sT7kKS.jpg",
+        "UbDb6YabkWw": "assets/posters/UbDb6YabkWw.jpg",
+        "Md9LPtLoSyV": "assets/posters/Md9LPtLoSyV.jpg",
+        "FuBTenaiTqv": "assets/posters/FuBTenaiTqv.jpg",
+        "Em7TeX2SqTn": "assets/posters/Em7TeX2SqTn.jpg",
+        "R94zxhnXTCH": "assets/posters/R94zxhnXTCH.jpg",
+        "-KFeN_snxTq": "assets/posters/-KFeN_snxTq.jpg",
+        "BRhmJWXUvQd": "assets/posters/BRhmJWXUvQd.jpg"
+      }
+    },
+    {
+      "id": "217992545",
+      "slug": "shorts-videos",
+      "title": "Shorts Videos",
+      "tags": [
+        "Advertising",
+        "Fine Arts"
+      ],
+      "kind": "video",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/090579217992545.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [],
+      "videos": [
+        "MTInTHZtKcQ",
+        "JpEPUQFrZcQ",
+        "QxS2YUYthtX",
+        "Uq3jKD-yYJ2",
+        "LgiWKSJrEP2",
+        "NU2PjobgkAL",
+        "JLniG47KTrV",
+        "-XX_TjSWUvC",
+        "GViTVoZEI4T",
+        "4Za93CocPkK",
+        "N9aeDI9vpV7",
+        "8P5ysQteDiE"
+      ],
+      "behanceSlug": "Shorts-Videos",
+      "posters": {
+        "MTInTHZtKcQ": "assets/posters/MTInTHZtKcQ.jpg",
+        "JpEPUQFrZcQ": "assets/posters/JpEPUQFrZcQ.jpg",
+        "QxS2YUYthtX": "assets/posters/QxS2YUYthtX.jpg",
+        "Uq3jKD-yYJ2": "assets/posters/Uq3jKD-yYJ2.jpg",
+        "LgiWKSJrEP2": "assets/posters/LgiWKSJrEP2.jpg",
+        "NU2PjobgkAL": "assets/posters/NU2PjobgkAL.jpg",
+        "JLniG47KTrV": "assets/posters/JLniG47KTrV.jpg",
+        "-XX_TjSWUvC": "assets/posters/-XX_TjSWUvC.jpg",
+        "GViTVoZEI4T": "assets/posters/GViTVoZEI4T.jpg",
+        "4Za93CocPkK": "assets/posters/4Za93CocPkK.jpg",
+        "N9aeDI9vpV7": "assets/posters/N9aeDI9vpV7.jpg",
+        "8P5ysQteDiE": "assets/posters/8P5ysQteDiE.jpg"
+      }
+    },
+    {
+      "id": "217989345",
+      "slug": "trailer-video",
+      "title": "Trailer Video",
+      "tags": [
+        "Branding",
+        "Motion Graphics",
+        "Premiere Pro",
+        "After Effects",
+        "DaVinci Resolve"
+      ],
+      "kind": "video",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/be802a217989345.Y3JvcCwxMjAzLDk0MSwyMzUsMA.png",
+      "images": [],
+      "videos": [
+        "U7E7nGWyrQ4",
+        "IYHCTTewCLQ",
+        "3y9pS-7N--s",
+        "HLkkYa32s5J",
+        "7vHbHfaQjrY",
+        "WKC6FEWm7QR",
+        "CfjDPnZeIzE"
+      ],
+      "behanceSlug": "Trailer-Video",
+      "posters": {
+        "U7E7nGWyrQ4": "assets/posters/U7E7nGWyrQ4.jpg",
+        "IYHCTTewCLQ": "assets/posters/IYHCTTewCLQ.jpg",
+        "3y9pS-7N--s": "assets/posters/3y9pS-7N--s.jpg",
+        "HLkkYa32s5J": "assets/posters/HLkkYa32s5J.jpg",
+        "7vHbHfaQjrY": "assets/posters/7vHbHfaQjrY.jpg",
+        "WKC6FEWm7QR": "assets/posters/WKC6FEWm7QR.jpg",
+        "CfjDPnZeIzE": "assets/posters/CfjDPnZeIzE.jpg"
+      }
+    },
+    {
+      "id": "218106207",
+      "slug": "motion-graphic",
+      "title": "Motion Graphic",
+      "tags": [
+        "Motion Graphics"
+      ],
+      "kind": "video",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/623745218106207.Y3JvcCwxMjg4LDEwMDgsMTM3LDA.png",
+      "images": [],
+      "videos": [
+        "SAAvaw6-ML4",
+        "LyMP2J6mdWB",
+        "VMZuKbdwyf3",
+        "-JeiJ2CFHUF"
+      ],
+      "behanceSlug": "Motion-Graphic",
+      "posters": {
+        "SAAvaw6-ML4": "assets/posters/SAAvaw6-ML4.jpg",
+        "LyMP2J6mdWB": "assets/posters/LyMP2J6mdWB.jpg",
+        "VMZuKbdwyf3": "assets/posters/VMZuKbdwyf3.jpg",
+        "-JeiJ2CFHUF": "assets/posters/-JeiJ2CFHUF.jpg"
+      }
+    },
+    {
+      "id": "217991035",
+      "slug": "thumbnail-designs",
+      "title": "Thumbnail Designs",
+      "tags": [
+        "Graphic Design"
+      ],
+      "kind": "image",
+      "cover": "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/40cc3b217991035.6a94f609a16e3.jpg",
+      "images": [
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/64374e217991035.6aa62a2843a13.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/e33f6c217991035.6aa62a28440c1.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/3edfdd217991035.6799fa52e52da.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/714d63217991035.6799fa52e4d57.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/e750e9217991035.6799fa52e59b3.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/b82a09217991035.6799fa52e727d.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/8ce7f2217991035.6849bfd4d9d27.jpeg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/796d89217991035.6849bfd4da2e7.png",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/893aa5217991035.6799fa53ea652.jpg",
+        "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/29cfa3217991035.6799fbb6a928a.png"
+      ],
+      "videos": [],
+      "behanceSlug": "Thumbnail-Designs",
+      "posters": {}
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "_comment": "Set provider + id to switch analytics on. Leave provider empty to ship no tracking at all. All three options below are cookieless, so no consent banner is needed.",
+  "provider": "",
+  "id": "",
+  "_options": {
+    "cloudflare": "provider=cloudflare, id=<token from Cloudflare dash > Web Analytics > add site>",
+    "goatcounter": "provider=goatcounter, id=<your-code>  (script loads from <your-code>.goatcounter.com)",
+    "plausible": "provider=plausible, id=vikasbanjare.github.io  (the domain you registered)"
+  }
+}

@@ -1,0 +1,9 @@
+# build scratch
+.build/
+__pycache__/
+*.pyc
+.tmp-*
+.DS_Store
+# design explorations, not shipped
+prototypes/
+.gstack/
