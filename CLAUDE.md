@@ -16,10 +16,12 @@ the bundle mechanics, the build, and every person-specific knob.
 - Person-specific content lives in `rebuild.py` (constants + `R` + `MENU`/`OS_LABELS` +
   `CAREER`/`LAUNCH_CARDS`/`QUOTES`/`SLOTS`), `parts.py` (`PROCESS_DATA`/`EXPERIENCE`/
   `EMPLOYERS`/`WALL`/`STACK`), `data/projects.json` (categories + YouTube ids) and
-  `components/work-section.html` (`FEATURED`). Colours live in `palette.py` only.
+  `components/work-section.html` (`FEATURED`). Colours: five themes in `palette.py`;
+  components use role variables only (`var(--accent)`), never hex.
   The repo is public — no stale contact details.
-- Only facts from avinash-portfolio.super.site or the videos themselves: no invented
-  metrics, clients or tools. The brand wall is inferred from video titles — say so if asked.
+- Only facts from his résumé, avinash-portfolio.super.site or the videos themselves: no
+  invented metrics, clients or tools. Brands on the wall beyond his employers and clients
+  are inferred from video titles — say so if asked.
 - New behaviour = a manifest asset with a UUID id referenced from `<head>`; inline body scripts never run.
 - Injected JS must be strict ES5; never listen to `wheel`; never `scrollTo`/`scrollIntoView`; never `100vw`.
 - Overlays must `stopPropagation()` on wheel/touchmove (the host hijacks the wheel) — never `preventDefault`.

@@ -5,7 +5,8 @@ Rebuild the AI Flow bundle as Avinash Chandra Banjare's portfolio.
 Keeps the original design's structure — same markup, Three.js hero, React/dc
 runtime, fonts, scroll and hover behaviour — and swaps the content and the
 palette: copy, the image slots, the brand wall, the employer logos and every
-colour (palette.py re-inks aifloh's lime-on-navy to amber on warm black).
+colour (palette.py turns aifloh's hard-coded colours into theme variables; the
+visitor picks one of five themes from the header).
 
 Sources of truth:
   - https://avinash-portfolio.super.site/  (copy, roles, contact, categories)
@@ -144,7 +145,7 @@ R = [
 
     # ── 05 sector map → career ──
     ("05 — Sector map", "05 — Experience"),
-    ("Every mission on the map.", "Four roles. Three countries."),
+    ("Every mission on the map.", "Seven roles. Three countries."),
     ("Hover a star to read its case dossier.", "Hover a studio to read what I did there."),
     ("Hover a star to read its dossier", "Hover a studio to read the detail"),
     ("AIF sector map · epoch 2026.6", "Career map · 2022 — 2026"),
@@ -157,14 +158,14 @@ R = [
      "What the reel adds up to — counted from the films, not estimated."),
     ("Pad 01 — Fintech", "Pad 01 — Reel"),
     ("Pad 02 — Consumer app", "Pad 02 — Reach"),
-    ("Pad 03 — B2B SaaS", "Pad 03 — Studios"),
+    ("Pad 03 — B2B SaaS", "Pad 03 — Roles"),
     ("qualified signups", "films in the reel"),
     ("organic views", "impressions on three shorts"),
-    ("for 40 target terms", "studios · India · UAE · US"),
+    ("for 40 target terms", "roles since 2022 · India · UAE · US"),
     # the animated count-up target lives in data-launch-fig, not the label
     ('data-launch-fig="+240%"', f'data-launch-fig="{N_VID}"'),
     ('data-launch-fig="4.1M"', 'data-launch-fig="29M"'),
-    ('data-launch-fig="#1"', 'data-launch-fig="3"'),
+    ('data-launch-fig="#1"', f'data-launch-fig="{len(parts.EXPERIENCE)}"'),
     # the static text before the count-up runs, in the same shape as each new figure
     (">+0%<", ">0<"),
     (">0.0M<", ">0M<"),
@@ -174,8 +175,9 @@ R = [
     ("07 — Studio", "07 — About"),
     ("Everyone sells<br>strategy. We ship<br>the thing.", "Everyone talks<br>content. I ship<br>the cut."),
     ("aifloh is one team that designs, films, builds and automates. No handoffs, no three vendors blaming each other, no six-week wait for a deck nobody reads.",
-     "I'm a video editor with a passion for visual experiences that captivate and inspire. Alongside the edit I shoot, "
-     "design thumbnails and run Exploring Korba Camp — an ecotourism business and one of the best-known travel pages in Chhattisgarh."),
+     "I'm a video editor with a passion for visual experiences that captivate and inspire. A mechanical engineer by degree "
+     "(Institute of Technology, Korba), cutting video full-time since 2022. Alongside the edit I shoot, design thumbnails and run "
+     "Exploring Korba Camp — an ecotourism business and one of the best-known travel pages in Chhattisgarh."),
     ("One team, one loop", "One editor, start to finish"),
     ("The person who writes it edits it, and the person who designs it ships it. Feedback lands in hours, not sprints.",
      "I take the brief, build the structure, cut, animate and deliver. Feedback lands with the person who made the edit, not a chain of handoffs."),
@@ -217,7 +219,7 @@ R = [
 
     # ── 08 quote cards: factual, attributed to the role — not invented praise ──
     ("They replaced four vendors and shipped more in a month than we had all quarter.",
-     "Managed the junior editors, reviewed their cuts and ran the brainstorms for new client ideas."),
+     "Ensured the quality of every video and managed all the editors and content in the company."),
     ("The automations alone paid for the engagement. The film was the part our board kept quoting.",
      "Delivers batches of videos for the studio's clients — short-form, UGC and talking-head edits, on schedule, from India."),
 
@@ -228,10 +230,10 @@ R = [
     ("Studio time", "Time in India"),
     (">Add your number<", f">{PHONE}<"),
     (">Behance</a>", ">YouTube</a>"),
-    ("Bengaluru · working worldwide", "India · editing remotely for studios in the UAE and the US"),
+    ("Bengaluru · working worldwide", "Korba, Chhattisgarh · editing remotely for studios in the UAE and the US"),
 
     # ── internal: theme storage key ──
-    ("'aifloh-theme'", "'ab-theme'"),
+    ("'aifloh-theme'", "'ab-theme-legacy'"),
 ]
 # anchors that must be unique, or the swap would brand something else too
 UNIQUE = {">Services<", ">Studio<", "built with.", "you're building.", "07 — Studio", "finance team likes.",
@@ -334,6 +336,21 @@ tpl, n = re.subn(r'(<span data-lines="1">%s</span>\s*</h1>)' % re.escape(NAME),
                  lambda m: m.group(1) + TAGLINE, tpl, count=1)
 assert n == 1, "hero h1 close not found"
 
+# 1c-bis. The header's light-mode button becomes the colour-theme picker. Its
+#         handler is guarded (`if (tbtn)`), so swapping the element disables the
+#         old light mode; parts.THEME_SCRIPT fills the slot at runtime.
+m = re.search(r'<button data-chrome="theme-btn".*?</button>', tpl, re.S)
+assert m, "theme button not found"
+tpl = tpl[:m.start()] + '<div data-ab-picker style="position:relative; display:flex;"></div>' + tpl[m.end():]
+# the hero keeps its scene on the React instance; expose it so the theme script can re-set the shader colours
+assert tpl.count("this._scene = scene;") == 1, "scene handle drifted"
+tpl = tpl.replace("this._scene = scene;", "this._scene = scene; window.__abScene = scene;")
+
+# 1c-ter. His portrait opens the About column (anchor is the eyebrow R just renamed).
+m = re.search(r'(<div style="display:flex; flex-direction:column; gap:22px;">)(\s*<span[^>]*>07 — About</span>)', tpl)
+assert m, "about column opener not found"
+tpl = tpl[:m.start()] + m.group(1) + parts.PORTRAIT_HTML + m.group(2) + tpl[m.end():]
+
 # 1d. Rocket travel: the 16:9 card is much shorter than the old 3:4 one, so a
 #     52% offset barely moved. Give it a full card-height climb.
 tpl = tpl.replace("transform:translateX(-50%) translateY(52%);",
@@ -369,7 +386,7 @@ TITLE = (
     f"<title>{PAGE_TITLE}</title>\n"
     f'<meta name="description" content="{DESC}">\n'
     f'<meta name="author" content="{NAME}">\n'
-    f'<meta name="theme-color" content="{palette.BG}">\n'
+    f'<meta name="theme-color" content="{palette.THEMES[palette.DEFAULT]["bg"]}">\n'
     f'<link rel="canonical" href="{SITE}">\n'
     '<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">\n'
     # share preview: without these, a link pasted into LinkedIn or WhatsApp
@@ -451,8 +468,8 @@ tpl = tpl.replace(
 # 4d. experience dossiers: the three star cards are the three studios
 CAREER = [
     ("Newform", "Video Editor · USA, remote", "Batches of client videos · 2025 — present"),
-    ("Knockout Media", "Senior Video Editor · UAE", "Led the junior editors · 2025"),
-    ("The Hub Bengaluru", "Junior Video Editor · Bengaluru", "Shot and cut the studio's films · 2023 — 2024"),
+    ("Knockout Media", "Senior Video Editor · UAE", "Quality and the whole edit team · Feb — May 2025"),
+    ("The Hub Bengaluru", "Senior Video Producer · Bengaluru", "Shot and edited the studio's films · 2023 — 2024"),
 ]
 # the pin labels sit outside the cards and picked up the global project-name
 # swap, so name the studios there too
@@ -648,7 +665,7 @@ GAL_UUID = "9f2c7d14-3b6a-4e18-9c52-71d0a4e8f230"  # fixed: loader matches a str
 
 def add_js(uid, src):
     manifest[uid] = {"mime": "text/javascript", "compressed": False,
-                     "data": base64.b64encode(palette.recolor(src).encode()).decode()}
+                     "data": base64.b64encode(palette.tokenize(src).encode()).decode()}
 
 
 add_js(GAL_UUID, script_js)
@@ -765,8 +782,8 @@ def brand_svg(key, ink):
 stack_payload = []
 for group, items in parts.STACK:
     rows = []
-    for name, key, mono, ink, bg in items:
-        rows.append([name, brand_svg(key, ink), mono, ink, bg])
+    for name, key, mono, ink, bg, level in items:
+        rows.append([name, brand_svg(key, ink), mono, ink, bg, level])
     stack_payload.append([group, rows])
 real_marks = sum(1 for _, rows in stack_payload for r in rows if r[1])
 
@@ -789,13 +806,24 @@ if ANALYTICS["provider"] and ANALYTICS["id"]:
 else:
     print("  analytics          : none configured (no tracking shipped)")
 
-# ── 6. palette: re-ink everything that still carries aifloh's colours ────────
-# Runs after every anchor above (several of them match on the old colours) and
-# covers the inline styles, the Three.js scene and the light-mode colour table.
+# 5f. Colour themes: the variable table for every theme goes in <head>, the
+#     picker script beside the other injected scripts. It is added last so it
+#     lands first after the anchor and sets <html data-theme> before anything paints.
+tpl = tpl.replace("</head>", palette.theme_css() + parts.THEME_CSS + "</head>", 1)
+THEME_UUID = "e2c7a9d4-6f1b-4c83-9a5e-3d8b7f2c1a64"
+add_js(THEME_UUID, parts.THEME_SCRIPT
+       .replace("__THEMES__", json.dumps(palette.theme_list(), separators=(",", ":")))
+       .replace("__DEFAULT__", json.dumps(palette.DEFAULT)))
+tpl = tpl.replace(head_anchor, head_anchor + f'\n<script src="{THEME_UUID}"></script>', 1)
+
+# ── 6. palette: every remaining aifloh colour becomes a theme variable ───────
+# Runs after every anchor above (several of them match on the old colours).
+# Three.js literals get the default theme's real hex; THEME_SCRIPT re-sets them live.
 _lime = tpl.lower().count("#b6f500")
-tpl = palette.recolor(tpl)
+tpl = palette.tokenize(tpl)
 assert "#b6f500" not in tpl.lower() and "#04060d" not in tpl.lower(), "palette pass incomplete"
-print(f"  palette            : {_lime} lime tokens re-inked to amber; navy → warm black")
+assert "THREE.Color('var(" not in tpl and "col: 'var(" not in tpl, "a shader colour became a CSS variable"
+print(f"  palette            : {_lime} lime tokens → var(--accent); {len(palette.THEMES)} themes, default {palette.DEFAULT}")
 
 # Safari (iOS and macOS) needs -webkit-backdrop-filter or every frosted panel —
 # header, menu, viewer bar, badges — renders flat. Run this last so it also
@@ -822,7 +850,7 @@ out = out.replace("<title>Bundled Page</title>", f"<title>{PAGE_TITLE}</title>")
 # silently as a dead section. Fail the build instead.
 if shutil.which("node"):
     import tempfile
-    for uid in (GAL_UUID, WORK_UUID, PROCESS_UUID, EXP_UUID):
+    for uid in (GAL_UUID, WORK_UUID, PROCESS_UUID, EXP_UUID, THEME_UUID):
         src = base64.b64decode(manifest[uid]["data"]).decode()
         with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
             fh.write(src)

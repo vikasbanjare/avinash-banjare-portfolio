@@ -7,9 +7,10 @@ the reasoning (in `git log`) are all here. A fresh Claude Code session opened in
 this folder gets `CLAUDE.md` automatically and should read this file first.
 
 Built for Avinash Chandra Banjare (vikasbanjare.github.io/avinash-banjare-portfolio)
-from avinash-portfolio.super.site. As of 2026-09-22: 12 categories, 18 films,
-2 thumbnail designs. It descends from the vikas-portfolio pipeline (Behance-based);
-this version is YouTube-based and amber-on-warm-black instead of lime-on-navy.
+from avinash-portfolio.super.site and his résumé (Sep 2026). As of 2026-09-22:
+12 categories, 18 films, 2 thumbnail designs, 7 roles. It descends from the
+vikas-portfolio pipeline (Behance-based); this version is YouTube-based, every
+colour is a CSS variable, and the visitor picks one of five colour themes.
 
 ---
 
@@ -20,8 +21,8 @@ this version is YouTube-based and amber-on-warm-black instead of lime-on-navy.
 | `source/ai-flow-source.html` | The original Claude Design bundle (3 MB). Never edited. Contains Babel, Three.js, React, the `dc` runtime, fonts, and the page template + manifest. |
 | `rebuild.py` | The build. `python3 rebuild.py` → writes `index.html`. All person-specific copy and mappings for the *original* sections live here. |
 | `parts.py` | Markup + ES5 scripts for everything *added* to the page: YouTube gallery viewer, Process section + pipeline animation, experience cards, software stack, brand-wall data, analytics loader. |
-| `palette.py` | The design tokens and `recolor()`, the pass that re-inks every hard-coded colour in the bundle (hex, `rgb()`, `rgba()`, and the light-mode toggle's colour table). |
-| `render_assets.py` | Draws the images that are not YouTube frames: one text cover per category, white wordmark tiles for the brand wall, monogram tiles for the employers, the og-card. Headless Google Chrome + Google Fonts, then `sips`. |
+| `palette.py` | The five themes (`THEMES`, `DEFAULT`) and `tokenize()`, the pass that rewrites every hard-coded colour in the bundle to a role variable (`var(--accent)`, `rgba(var(--accent-rgb),.3)`); `theme_css()` emits the per-theme variable table. |
+| `render_assets.py` | Draws the images that are not YouTube frames: one poster-style cover per category (Unbounded 900, six colour schemes, icon sticker, grain), white wordmark tiles for the brand wall, monogram tiles for the employers, the og-card with his portrait. Headless Google Chrome + Google Fonts, then `sips`. |
 | `components/work-section.html` | Section 02 (the category list + docked "program monitor"). Self-contained: one `<style>`, one `<section data-vbwork2>`, one `<script>`. Data-driven from `window.VB_WORK`. |
 | `data/projects.json` | The categories: title, tags, YouTube ids, per-video `meta` (title, `portrait`, `views`), poster paths, image paths + captions for the thumbnail designs. |
 | `data/analytics.json` | Empty by default = no tracking. Fill `provider` + `id` (cloudflare / goatcounter / plausible) to switch on. |
@@ -29,6 +30,7 @@ this version is YouTube-based and amber-on-warm-black instead of lime-on-navy.
 | `assets/posters/<videoId>.jpg` | One YouTube frame per film, 960px: `maxresdefault.jpg` for landscape, `oar2.jpg` (9:16) for vertical Shorts. |
 | `assets/frames/<slug>-NN.jpg` | 760px stills of design categories (for the work monitor). |
 | `assets/wall/`, `assets/logos/` | Generated wordmarks (brand wall) and monograms (employer cards), white tiles. |
+| `assets/portrait.jpg` | His photo from the Super.site, cropped to the head-and-shoulders disc (490×490). Ring, tint, grain and stickers are DOM, so they follow the theme. |
 | `assets/icons/` | CC0 brand marks (simple-icons) for the stack row. |
 | `assets/favicon.svg`, `assets/og-card.jpg` | Amber play-mark favicon and 1200×630 share image. |
 | `.claude/launch.json` | Local preview: `python3 -m http.server 4173`. |
@@ -73,10 +75,15 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
    overlay scrollbars hide it). Always `width:100%`.
 8. **Safari needs `-webkit-backdrop-filter`.** rebuild.py adds it in a final pass
    over the assembled template so injected markup is covered too.
-9. **Colours are hard-coded everywhere** — ~900 inline styles, `THREE.Color('#…')`
-   calls in the hero, and a `MAP` of `rgb(r, g, b)` strings the light-mode toggle
-   compares computed styles against. `palette.recolor()` handles all three forms;
-   it runs *last*, because several build anchors match on the old colours.
+9. **Colours are hard-coded everywhere** — ~900 inline styles, a few JS style
+   assignments and the hero's shader uniforms (`uBot uTop uGlow uCore uRim uFill`
+   plus `uColor` per orbit dot, from the items' `col:`). `palette.tokenize()`
+   rewrites all of them to role variables and runs *last*, because several build
+   anchors match on the old colours. Shaders cannot read CSS, so `THREE.Color`
+   literals and `col:` get the DEFAULT theme's hex; `parts.THEME_SCRIPT` re-sets
+   those uniforms in place (`window.__abScene`, exposed by rebuild.py) when the
+   theme changes. The old light-mode toggle is gone: its button element is the
+   picker's slot, and its handler is guarded so it never binds.
 10. **Testing gotchas:** background browser tabs throttle `requestAnimationFrame`,
     so scroll-linked activation and the flipbook look frozen — front the tab.
     GitHub Pages' CDN serves stale HTML for a minute after deploy — cache-bust
@@ -98,8 +105,10 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
    anchor is asserted to exist* (a few also asserted unique). Then positional
    rewrites: `MENU` (the eight hero orbit labels), `OS_LABELS` + `OS_LINKS` (node
    graph), social links wired by link text (+ an extra X anchor), hero CTAs,
-   `tel:`, the serif tagline under the h1, wordmark → type, `<html lang>`,
-   `<title>` + description + canonical + Open Graph + Twitter + favicon.
+   `tel:`, the serif tagline under the h1, the theme-picker slot in place of the
+   light-mode button, `window.__abScene`, the portrait block opening the About
+   column, wordmark → type, `<html lang>`, `<title>` + description + canonical +
+   Open Graph + Twitter + favicon.
 3. **Image slots** (`SLOTS`: slot-id → category slug; `STAR_LOGOS`: slot-id →
    employer monogram) → new `imageSlotsState` asset. Covers are downscaled with
    `sips` (macOS) into `.build/opt/`. Monograms and wall wordmarks are registered
@@ -118,8 +127,9 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
    "closer look" tiles `TEAM`), Process section inserted after `#os`
    (`PROCESS_UUID`, sections 04–09 renumbered 05–10, nav link `#os` → `#process`),
    Experience + Stack (`EXP_UUID`), optional analytics (`AN_UUID`).
-8. `palette.recolor()` over the template (and over every injected script as it is
-   encoded); `-webkit-backdrop-filter` pass; `node --check`; write.
+8. Theme variable table + picker script (`THEME_UUID`), then `palette.tokenize()`
+   over the template (and over every injected script as it is encoded);
+   `-webkit-backdrop-filter` pass; `node --check`; write.
 
 Section ids after the build: `#work` 02 · `#os` 03 · `#process` 04 · `#clients` 05
 (labelled "Brands") · `#starchart` 06 (Experience) · `#launches` 07 · `#studio` 08
@@ -157,49 +167,62 @@ go through all of it.
 
 ### 4c. `parts.py`
 - `PROCESS_DATA` + `PIPELINE`/`PIPE_SUB` (their crafts and the categories they open).
-- `EXPERIENCE` (roles, in their own words) + `EMPLOYERS` (name → monogram).
+- `EXPERIENCE` (roles, in their own words — résumé first, site second) + `EMPLOYERS`
+  (name → monogram; one per `logo` placeholder).
 - `WALL` (name → hover text). Studios from the profile; brands only where a video
   title names them.
-- `STACK` (software they name; keys map to `assets/icons/<key>.svg`, CC0 from
-  `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/<slug>.svg`).
+- `STACK` (software they name + the résumé's skill dots; keys map to
+  `assets/icons/<key>.svg`, CC0 from `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/<slug>.svg`).
 
 ### 4d. `components/work-section.html`
 `FEATURED` (line ~260) hardcodes the five slugs that lead the list; the header copy
 is inline (`02 — The work`, the h2, both `.vw2-sub-*` lines, the three `<dt>` labels).
 
-### 4e. `palette.py`, `assets/favicon.svg`, `data/analytics.json`
-Change the right-hand side of `MAP` (and the token constants) to re-skin; the covers
-and tiles read the same tokens, so re-run `render_assets.py` afterwards.
+### 4e. `palette.py`, `assets/favicon.svg`, `assets/portrait.jpg`, `data/analytics.json`
+Themes are the `THEMES` dict: add or edit one (every role, hex), set `DEFAULT`, rebuild.
+The favicon and the covers' `SCHEMES` in render_assets.py are theme-independent on
+purpose. The portrait is a 490×490 crop (`sips -c 490 490 --cropOffset y x`).
 
 ---
 
 ## 5. Design tokens (the "design system")
 
+Every colour on the page is a role variable; the five themes in `palette.THEMES`
+define the roles. New components never write hex — `var(--accent)`,
+`rgba(var(--glow-rgb),.4)`. Default theme: **Violet**.
+
+| Role | Used for | Violet · Ember · Mint · Coral · Ocean |
+|---|---|---|
+| `--bg` / `--bg-2` | page · menu, overlays | `#0a0812` · `#0b0908` · `#07090c` · `#0c0a0a` · `#070a12` |
+| `--panel` / `--panel-2` / `--panel-3` | cards, stills, hairline edges | per theme, one step lighter each |
+| `--text` / `--body` / `--body-2` | display · body · secondary body | near-white, tinted to the theme |
+| `--muted` / `--faint` | captions ≥ 6.5:1 · eyebrows ~3.8:1 (**never under 14px body copy**) | |
+| `--accent` / `--accent-hover` / `--on-accent` | ink + CTA · hover · text on the CTA | `#a58bff` · `#ffb020` · `#5cf2c2` · `#ff6a4d` · `#4da3ff` |
+| `--glow` / `--glow-2` / `--glow-deep` | wires, dots · pipeline steps · planet, section glows | `#ff4fa3` · `#1fb2a0` · `#7c5cff` · `#38d1f0` · `#ff8a3d` |
+| `--flame` | the LIFTOFF label | |
+| `--hero-top` / `--hero-fill` | the hero nebula's shader colours | |
+
 | Token | Value |
 |---|---|
-| Page background | `#0b0908` (menu/overlays `#100d0b`) |
-| Panel | `#161210` / `#1b1613`; frosted `rgba(255,255,255,.035)`; hairline `rgba(255,255,255,.10–.12)` |
-| Text | display `#faf7f2`, body `#efe9e1` / `#a0958a`, faint `#736a61` (**never under 14px** — fails 4.5:1) |
-| Amber (ink + CTA) | `#ffb020`, on-amber text `#1c1200`, hover `#ffc75c` |
-| Teal | `#1fb2a0` (glows, wires, hero nebula), `#5ee6d0` (pipeline steps, secondary dots) |
-| Liftoff | `#ff7a45` |
 | Display type | Space Grotesk 500–700, letter-spacing −.02 to −.045em |
 | Body type | Onest 300–700 |
-| Accent type | Instrument Serif italic 400 — numerals and one accent word per heading, in amber |
-| Section header | eyebrow `11.5px/600/.18em/uppercase/amber` · h2 `clamp(30px,3.7vw,54px)/600/1.05/-.035em` inside `<span data-lines="1">` · sub `15px/1.6/#a0958a`, max-width ~380px |
+| Accent type | Instrument Serif italic 400 — numerals and one accent word per heading, in `--accent` |
+| Covers (images) | Unbounded 900 uppercase, six saturated schemes cycling, icon sticker, ghost numeral, halftone dots, grain — theme-independent |
+| Section header | eyebrow `11.5px/600/.18em/uppercase/--accent` · h2 `clamp(30px,3.7vw,54px)/600/1.05/-.035em` inside `<span data-lines="1">` · sub `15px/1.6/--muted`, max-width ~380px |
 | Radii | 14–18px cards · 100px pills · 3–4px stills · 12px video tiles |
 | Motion | `cubic-bezier(.2,.7,.3,1)`, .5–.9s, stagger 60–90ms; transform + opacity only; `prefers-reduced-motion` respected |
 | Tap targets | ≥ 44px |
 
 Fonts load from Google Fonts (the bundle also embeds woff2). Voice: first person
 singular, never "we", never "client" as a noun for people, no invented metrics —
-only what the profile states or what can be counted in the data.
+only what the profile or résumé states or what can be counted in the data.
 
 Constraints every new component must meet: one root, scoped selectors + prefixed
 classes, **strict ES5** (`var`/`function` only), no `wheel` listeners, no
 `scrollTo`/`scrollIntoView`, no `100vw`, no `position:fixed` inside sections,
 `esc()` on every interpolation, keyboard + tap + click all open in one step,
-nothing hover-only, video iframes only on demand.
+nothing hover-only, video iframes only on demand, colours only as variables
+(and SVG colours via `style=""`, since presentation attributes cannot take `var()`).
 
 ---
 
