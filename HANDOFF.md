@@ -1,13 +1,15 @@
 # HANDOFF — how this portfolio is built, and how to rebuild it for someone else
 
 This repo generates a single-page portfolio (`index.html`) from a Claude Design
-export ("AI Flow" bundle) by swapping in one person's content. Nothing that
-matters lives in a chat: the code, the data, the assets and the reasoning (in
-`git log`) are all here. A fresh Claude Code session opened in this folder gets
-`CLAUDE.md` automatically and should read this file first.
+export ("AI Flow" bundle) by swapping in one person's content and re-inking the
+palette. Nothing that matters lives in a chat: the code, the data, the assets and
+the reasoning (in `git log`) are all here. A fresh Claude Code session opened in
+this folder gets `CLAUDE.md` automatically and should read this file first.
 
-Built for Vikas Banjare (vikasbanjare.github.io/vikas-portfolio). As of
-2026-09-20: 13 projects, 71 design pieces, 41 films.
+Built for Avinash Chandra Banjare (vikasbanjare.github.io/avinash-banjare-portfolio)
+from avinash-portfolio.super.site. As of 2026-09-22: 12 categories, 18 films,
+2 thumbnail designs. It descends from the vikas-portfolio pipeline (Behance-based);
+this version is YouTube-based and amber-on-warm-black instead of lime-on-navy.
 
 ---
 
@@ -17,21 +19,25 @@ Built for Vikas Banjare (vikasbanjare.github.io/vikas-portfolio). As of
 |---|---|
 | `source/ai-flow-source.html` | The original Claude Design bundle (3 MB). Never edited. Contains Babel, Three.js, React, the `dc` runtime, fonts, and the page template + manifest. |
 | `rebuild.py` | The build. `python3 rebuild.py` → writes `index.html`. All person-specific copy and mappings for the *original* sections live here. |
-| `parts.py` | Markup + ES5 scripts for everything *added* to the page: gallery viewer, tools section + pipeline animation, experience cards, software stack, analytics loader. |
-| `components/work-section.html` | Section 02 (the project list + docked "program monitor"). Self-contained: one `<style>`, one `<section data-vbwork2>`, one `<script>`. Data-driven from `window.VB_WORK`. |
-| `data/projects.json` | Scraped Behance projects: covers, gallery image URLs, video ids, poster paths. Regenerate for a new person (§4). |
+| `parts.py` | Markup + ES5 scripts for everything *added* to the page: YouTube gallery viewer, Process section + pipeline animation, experience cards, software stack, brand-wall data, analytics loader. |
+| `palette.py` | The design tokens and `recolor()`, the pass that re-inks every hard-coded colour in the bundle (hex, `rgb()`, `rgba()`, and the light-mode toggle's colour table). |
+| `render_assets.py` | Draws the images that are not YouTube frames: one text cover per category, white wordmark tiles for the brand wall, monogram tiles for the employers, the og-card. Headless Google Chrome + Google Fonts, then `sips`. |
+| `components/work-section.html` | Section 02 (the category list + docked "program monitor"). Self-contained: one `<style>`, one `<section data-vbwork2>`, one `<script>`. Data-driven from `window.VB_WORK`. |
+| `data/projects.json` | The categories: title, tags, YouTube ids, per-video `meta` (title, `portrait`, `views`), poster paths, image paths + captions for the thumbnail designs. |
 | `data/analytics.json` | Empty by default = no tracking. Fill `provider` + `id` (cloudflare / goatcounter / plausible) to switch on. |
-| `assets/img/<slug>/` | Self-hosted gallery images + `cover.*` per project. |
-| `assets/posters/<videoId>.jpg` | One real frame per Behance video (640px). |
-| `assets/frames/<slug>-NN.jpg` | 760px stills of the first ≤5 gallery images of design projects (for the work monitor). |
-| `assets/tools/`, `assets/icons/` | Logos for the person's own tools, and CC0 brand marks (simple-icons) for the stack row. |
-| `assets/favicon.svg`, `assets/og-card.jpg` | Favicon and 1200×630 share image. |
+| `assets/img/<slug>/cover.jpg` | Generated text cover per category (1280×720). `thumbnail-designs/01.jpg, 02.jpg` are the two real thumbnails from his site. |
+| `assets/posters/<videoId>.jpg` | One YouTube frame per film, 960px: `maxresdefault.jpg` for landscape, `oar2.jpg` (9:16) for vertical Shorts. |
+| `assets/frames/<slug>-NN.jpg` | 760px stills of design categories (for the work monitor). |
+| `assets/wall/`, `assets/logos/` | Generated wordmarks (brand wall) and monograms (employer cards), white tiles. |
+| `assets/icons/` | CC0 brand marks (simple-icons) for the stack row. |
+| `assets/favicon.svg`, `assets/og-card.jpg` | Amber play-mark favicon and 1200×630 share image. |
 | `.claude/launch.json` | Local preview: `python3 -m http.server 4173`. |
-| `prototypes/` (git-ignored) | Design explorations for section 02 (a-timeline, b-stack, c-index, d-filmstrip, e-monitor-index, f-editorial-monitor = shipped). `_data.js` is the shared fixture. |
+| `prototypes/` (git-ignored) | Design explorations for section 02 from the original pipeline. |
 
 Commands:
 
 ```bash
+python3 render_assets.py                 # only when titles, brands, employers or the palette change
 python3 rebuild.py                       # build index.html (runs node --check on every injected script)
 python3 -m http.server 4173              # preview at http://localhost:4173/
 python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (GitHub Pages, ~1 min)
@@ -52,7 +58,7 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
    Because head scripts run before the `dc` runtime mounts the document, every
    injected script polls for its own root node before wiring anything.
 3. **`</script>` inside the template.** The template JSON escapes every `/` as
-   `/`; rebuild.py does the same when writing back (`tpl_json.replace("/", "\\u002F")`).
+   `\u002F`; rebuild.py does the same when writing back.
 4. **`<image-slot>` elements** are filled from the `imageSlotsState` manifest asset
    (`{ "<slot-id>": { "u": "<data URI>" } }`). Slots support `fit="contain"`.
 5. **The host hijacks the wheel** (a `window` `wheel` listener, `passive:false`,
@@ -67,136 +73,103 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
    overlay scrollbars hide it). Always `width:100%`.
 8. **Safari needs `-webkit-backdrop-filter`.** rebuild.py adds it in a final pass
    over the assembled template so injected markup is covered too.
-9. **Two self-inflicted classes of bug, now guarded:** JS-in-Python quoting
-   (`\\'` depth) and placeholder collisions (a `__FIGMA__` placeholder that also
-   appeared as data). The build fails on any injected-script syntax error.
+9. **Colours are hard-coded everywhere** — ~900 inline styles, `THREE.Color('#…')`
+   calls in the hero, and a `MAP` of `rgb(r, g, b)` strings the light-mode toggle
+   compares computed styles against. `palette.recolor()` handles all three forms;
+   it runs *last*, because several build anchors match on the old colours.
 10. **Testing gotchas:** background browser tabs throttle `requestAnimationFrame`,
     so scroll-linked activation and the flipbook look frozen — front the tab.
     GitHub Pages' CDN serves stale HTML for a minute after deploy — cache-bust
-    (`?v=…`) before concluding a push failed. Synthetic `WheelEvent`s never scroll
-    anything; test the event *path* instead.
-11. **Behance videos are Adobe CCV iframes** — no MP4 exists. Poster frames come
-    from `https://www-ccv.adobe.io/v1/player/ccv/<ID>/embed?api_key=behance1` →
-    regex `posterframe":"…"` → a *signed URL that expires in ~3 days*, so posters
-    are downloaded at build time, never hotlinked.
+    (`?v=…`) before concluding a push failed.
+11. **YouTube, not Behance.** Titles come from oEmbed
+    (`youtube.com/oembed?url=…&format=json`). Orientation: `i.ytimg.com/vi/<id>/oar2.jpg`
+    exists (9:16) only for vertical Shorts and 404s otherwise — that is the test.
+    Players are `youtube-nocookie.com/embed/<id>?autoplay=1` iframes created on click.
+12. **Parallel headless Chrome deadlocks** on this machine; render_assets.py renders
+    one image at a time (~2s each) with a 90s timeout per image; a custom
+    `--user-data-dir` is what makes it hang, so the script never passes one.
 
 ---
 
 ## 3. Build pipeline (what `rebuild.py` does, in order)
 
 1. Load the bundle; parse template + manifest; load `data/projects.json`.
-2. **Copy replacements `R`**: a list of `(old, new)` pairs applied to the template.
-   *Every anchor is asserted to exist* — a template change fails loudly instead of
-   leaving the base copy on the page. Plus targeted edits: hero tagline line,
-   availability cell removal, wordmark swap for the raster logo, `<html lang>`,
+2. **Copy replacements `R`**: `(old, new)` pairs applied to the template. *Every
+   anchor is asserted to exist* (a few also asserted unique). Then positional
+   rewrites: `MENU` (the eight hero orbit labels), `OS_LABELS` + `OS_LINKS` (node
+   graph), social links wired by link text (+ an extra X anchor), hero CTAs,
+   `tel:`, the serif tagline under the h1, wordmark → type, `<html lang>`,
    `<title>` + description + canonical + Open Graph + Twitter + favicon.
-3. **Image slots** (`SLOTS`: slot-id → project slug; `STAR_LOGOS`: slot-id →
-   manifest logo uuid) → new `imageSlotsState` asset. Covers are downscaled with
-   `sips` (macOS) into `.build/opt/`.
-4. Structural fixes: launch rocket + team tiles to 16:9, social links wired by link
-   text (they ship as `href="#"`), `100vw` → `100%`, wall logos enlarged.
-5. Per-card rewrites by position (the template reuses identical placeholder
-   markup, so global replace would brand every card the same): experience
-   dossiers `CAREER`, star pin labels, launch cards `LAUNCH_CARDS`, the two quote
-   cards `QUOTES` (+ avatar initials), node-graph wiring `OS_LINKS`.
+3. **Image slots** (`SLOTS`: slot-id → category slug; `STAR_LOGOS`: slot-id →
+   employer monogram) → new `imageSlotsState` asset. Covers are downscaled with
+   `sips` (macOS) into `.build/opt/`. Monograms and wall wordmarks are registered
+   as new manifest PNGs with `uuid5` ids; the 17 old logos + old wordmark are dropped.
+4. Structural fixes: launch rocket + team tiles to 16:9, wall tiles rebuilt from
+   `parts.WALL` (three marquee tracks × three *identical* groups — the keyframes
+   translate one third of the track, so each track gets its own slice of the list:
+   4 / 3 / 3 brands) and the host's `const did = {…}` readout map replaced,
+   `100vw` → `100%`.
+5. Per-card rewrites by position: experience dossiers `CAREER` + star pin labels,
+   launch cards `LAUNCH_CARDS`, the two quote cards `QUOTES` (+ avatar initials).
 6. **Section 02 swap**: the whole `#work` section is replaced by
    `components/work-section.html`; its script is registered as manifest asset
-   `WORK_UUID` wrapped in a poller + a watchdog that reveals rows if the entrance
-   observer never fires. `VB_WORK` (covers/images/posters/frames as file paths) is
-   inlined into it.
-7. Gallery viewer (`GAL_UUID`), Tools section inserted after `#os` (`TOOLS_UUID`,
-   sections 04–09 renumbered 05–10), Experience + Stack (`EXP_UUID`), optional
-   analytics (`AN_UUID`).
-8. `-webkit-backdrop-filter` pass; `node --check` on every injected script; write.
+   `WORK_UUID` wrapped in a poller + a watchdog. `VB_WORK` is inlined into it.
+7. Gallery viewer (`GAL_UUID`, also wires launch cards `LAUNCH` and the four
+   "closer look" tiles `TEAM`), Process section inserted after `#os`
+   (`PROCESS_UUID`, sections 04–09 renumbered 05–10, nav link `#os` → `#process`),
+   Experience + Stack (`EXP_UUID`), optional analytics (`AN_UUID`).
+8. `palette.recolor()` over the template (and over every injected script as it is
+   encoded); `-webkit-backdrop-filter` pass; `node --check`; write.
 
-Section ids after the build: `#work` 02 · `#os` 03 · `#tools` 04 · `#clients` 05
-(labelled "Brands") · `#starchart` 06 (Experience) · `#launches` 07 · `#studio` 08 ·
-`#results` 09 · `#contact` 10. Menu links: `#work #tools #studio #results #contact`.
+Section ids after the build: `#work` 02 · `#os` 03 · `#process` 04 · `#clients` 05
+(labelled "Brands") · `#starchart` 06 (Experience) · `#launches` 07 · `#studio` 08
+(labelled "About") · `#results` 09 · `#contact` 10. Nav: Work · Process · About ·
+Results · Contact.
 
 ---
 
 ## 4. Rebuilding for a NEW person — the checklist
 
-Everything below is Vikas-specific and must be replaced. The build will not warn
-you about stale *content* (only about missing anchors), so go through all of it.
+The build will not warn you about stale *content* (only about missing anchors), so
+go through all of it.
 
-### 4a. Their Behance → `data/projects.json` + assets
-Behance is JS-rendered (curl returns no projects). Use a real browser:
-1. Profile page: scroll, collect `a[href*="/gallery/"]` → project ids + slugs;
-   collect cover images (`/projects/<size>/<hash><projectId>.…` → normalise to
-   `/projects/max_808_webp/`).
-2. Each project: **scroll until the count stops changing** (players lazy-load;
-   a fixed scroll under-counted one project), then collect `img` sources containing
-   `project_modules` and iframes matching `ccv/<id>/embed`.
-3. Write `projects.json` entries: `{id, slug, behanceSlug, title, tags[],
-   kind:"image"|"video", cover, images[], videos[], posters{}}`. Newest first.
-   (The `profile` block at the top of the file is a leftover and **not used** by
-   rebuild.py; contact details come from the constants in rebuild.py.)
-4. Download images: `curl -L -A "Mozilla/5.0" -e https://www.behance.net/ …` into
-   `assets/img/<slug>/NN.<ext>` and `cover.<ext>` (hotlinking works but a deleted
-   project would blank a gallery).
-5. Posters: for each video id fetch the CCV embed, extract `posterframe`, download,
-   `sips -Z 640` into `assets/posters/<id>.jpg`, set `posters[id]`.
-6. Frames: `sips -Z 760` of the first ≤5 gallery images of each design project →
-   `assets/frames/<slug>-NN.jpg`.
+### 4a. Their videos → `data/projects.json` + assets
+1. Collect YouTube ids per category (his came from the Super.site page: every
+   `youtube.com/embed/<id>` iframe under an `<h2>`).
+2. Titles: oEmbed. Orientation: `oar2.jpg` exists → `portrait: true`. Stated
+   view/impression figures → `meta[id].views` (only what *they* publish).
+3. Write one project per category: `{id, slug, title, tags[2], kind:"video"|"image",
+   cover:"assets/img/<slug>/cover.jpg", images[], videos[], posters{}, meta{},
+   captions[]}`. Display order = file order; `FEATURED` in the component leads.
+4. Posters: `curl i.ytimg.com/vi/<id>/{maxresdefault|oar2}.jpg`, `sips -Z 960`
+   into `assets/posters/<id>.jpg`. Design pieces → `assets/img/<slug>/NN.jpg` +
+   `sips -Z 760` stills into `assets/frames/<slug>-NN.jpg`.
+5. `python3 render_assets.py` → covers, wall, logos, og-card.
 
 ### 4b. `rebuild.py`
-- `EMAIL`, `PHONE`, `LINKEDIN`, `BEHANCE` (lines ~77–80). The repo is public —
-  never push someone else's file with these still set to Vikas.
-- `R` — every line of copy: hero eyebrow/title/lede, menu service pairs, section
-  02 header, `Project title one/two/three` → their three featured projects (+ the
-  payload/result lines), 03 copy, 04 "Brands I've", 05 experience labels + city/
-  year pins, 06 launch pad names/labels/`data-launch-fig` counts, 07 studio
-  principles, 08 results stats + quote-card copy, 09 contact, `'aifloh-theme'`.
-- `SITE`, `DESC`, `TITLE` block (meta/OG).
-- `SLOTS` (which project covers go in which image slot) and `STAR_LOGOS`
-  (company logos for the experience cards — see 4d).
-- `CAREER` (3 employers: name/role/one-liner), `LAUNCH_CARDS`, `QUOTES` (two
-  factual cards + avatar initials), `OS_LINKS` (which disciplines link to which —
-  the node *labels* are set in `R`: `>Website<` → `>UI/UX<` etc.).
-- `WORDS` only matters if the project count leaves 11–15.
+- `NAME`, `EMAIL`, `PHONE`/`TEL`, `LINKEDIN`, `YOUTUBE`, `INSTAGRAM`, `X_URL`.
+- `R` — every line of copy: hero eyebrow/lede/tagline (`TAGLINE`), nav, 02 header,
+  03 header, 04 wall copy + sector chips, 05 experience labels + pin labels, 06
+  launch pads/labels/`data-launch-fig`, 07 about copy + three principles + four
+  "closer look" captions, 08 results stats + quote-card copy, 09 contact.
+- `MENU` (8 orbit labels), `OS_LABELS`/`OS_LINKS` (8 nodes), `SITE`/`DESC`/`PAGE_TITLE`.
+- `SLOTS`, `STAR_LOGOS`, `CAREER` (3 studios), `LAUNCH_CARDS`, `LAUNCH`, `TEAM`, `QUOTES`.
 
 ### 4c. `parts.py`
-- `TOOLS_DATA` + `PIPELINE`/`PIPE_SUB` (their own software; ContentIntel/VoiceFlow/
-  Pulse/Daxio are Vikas's). Logos in `assets/tools/`.
-- `EXPERIENCE` (full bullets per employer, from their resume).
-- `STACK` (software they use; keys map to `assets/icons/<key>.svg`, CC0 from
-  `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/<slug>.svg`; `None` = monogram tile).
+- `PROCESS_DATA` + `PIPELINE`/`PIPE_SUB` (their crafts and the categories they open).
+- `EXPERIENCE` (roles, in their own words) + `EMPLOYERS` (name → monogram).
+- `WALL` (name → hover text). Studios from the profile; brands only where a video
+  title names them.
+- `STACK` (software they name; keys map to `assets/icons/<key>.svg`, CC0 from
+  `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/<slug>.svg`).
 
-### 4d. Assets baked into the *bundle* itself
-The base bundle's manifest contains **17 real client logos from Vikas's studio**
-(rendered as the "Brands" wall, each repeated 3× in the marquee) and his wordmark.
-For another person these must be replaced (same uuids, new base64) or the
-section removed. Wall uuids, in template order:
+### 4d. `components/work-section.html`
+`FEATURED` (line ~260) hardcodes the five slugs that lead the list; the header copy
+is inline (`02 — The work`, the h2, both `.vw2-sub-*` lines, the three `<dt>` labels).
 
-```
-01f4091d-be8b-4550-be7f-a35230217bdf  m.Stock by Mirae Asset
-2d7aadb2-5e6a-48a0-b48b-475be136476b  Novo Nordisk
-fb3ba0d9-e4ae-4ff5-8a02-1fdd1119941a  Unacademy
-041a9c5f-4859-4674-b831-60ce1c6f12da  Vedantu
-c6f31087-90f2-4533-841e-b0ca22efb5a1  Skydo
-4f18b6ad-811b-4858-ab83-d38301b5eb71  Wealthy
-1f70d57c-d6e9-4481-8d05-327573418004  Novus
-da693d5c-d9e0-423b-9429-6e87cc104927  Natural Remedies
-4c525ed5-636b-48f6-a6e1-059c25938b6e  TrueProfile.io
-42671faf-857d-408e-bec1-d29e5407de21  DataFlow Group
-c0d880cb-adbe-416c-bb3c-39dac9d970d3  Purple Finance
-4e702b37-262f-4ded-926f-ee66148d425d  Hrfy.ai
-1c425850-a0d0-478b-b871-690158c97b7a  i talk
-802b3a46-d67c-493f-adc8-a13b49395edd  GGame
-62f6d687-6645-467b-b7bc-2939c2b5eadd  Toyflix
-bf2a2aa6-f39e-43ca-9ac8-5a6aad4e7821  i30 Learning Centre
-fc6d2283-9876-4602-9724-343b4aa930bb  The Hub Bengaluru
-```
-`STAR_LOGOS` in rebuild.py points three of these at the experience cards.
-The `<img alt>` texts in the template also name these brands — update them in `R`.
-
-### 4e. `components/work-section.html`
-Data-driven, but `FEATURED` (line ~260) hardcodes the five slugs that lead the
-list; the approved header copy is inline (`02 — The work`, the h2, both `.vw2-sub-*`
-lines). The count line and filter counts are computed.
-
-### 4f. `assets/favicon.svg`, `assets/og-card.jpg` (share image), `data/analytics.json`.
+### 4e. `palette.py`, `assets/favicon.svg`, `data/analytics.json`
+Change the right-hand side of `MAP` (and the token constants) to re-skin; the covers
+and tiles read the same tokens, so re-run `render_assets.py` afterwards.
 
 ---
 
@@ -204,30 +177,29 @@ lines). The count line and filter counts are computed.
 
 | Token | Value |
 |---|---|
-| Page background | `#04060d` (menu/overlays `#060a14`) |
-| Panel | `rgba(255,255,255,.035)`; hairline `rgba(255,255,255,.10–.12)` |
-| Text | display `#f6f9ff`, body `#eaf0ff` / `#8da0c4`, faint `#5d6e8e` (**never under 14px** — fails 4.5:1) |
-| Lime (ink + CTA) | `#b6f500`, on-lime text `#06140a`, hover `#cbff3d` |
-| Blue / cyan | `#2f6bff` (glows, wires), `#7fd4ff` (design nodes) |
-| Liftoff orange | `#ff9d3d` |
+| Page background | `#0b0908` (menu/overlays `#100d0b`) |
+| Panel | `#161210` / `#1b1613`; frosted `rgba(255,255,255,.035)`; hairline `rgba(255,255,255,.10–.12)` |
+| Text | display `#faf7f2`, body `#efe9e1` / `#a0958a`, faint `#736a61` (**never under 14px** — fails 4.5:1) |
+| Amber (ink + CTA) | `#ffb020`, on-amber text `#1c1200`, hover `#ffc75c` |
+| Teal | `#1fb2a0` (glows, wires, hero nebula), `#5ee6d0` (pipeline steps, secondary dots) |
+| Liftoff | `#ff7a45` |
 | Display type | Space Grotesk 500–700, letter-spacing −.02 to −.045em |
 | Body type | Onest 300–700 |
-| Accent type | Instrument Serif italic 400 — numerals and one accent word per heading, in lime |
-| Section header | eyebrow `11.5px/600/.18em/uppercase/lime` · h2 `clamp(30px,3.7vw,54px)/600/1.05/-.035em` inside `<span data-lines="1">` (host animates each `<br>` line) · sub `15px/1.6/#8da0c4`, max-width ~380px |
-| Radii | 14–18px cards · 100px pills (site chrome only) · 3–4px contact prints / stills |
+| Accent type | Instrument Serif italic 400 — numerals and one accent word per heading, in amber |
+| Section header | eyebrow `11.5px/600/.18em/uppercase/amber` · h2 `clamp(30px,3.7vw,54px)/600/1.05/-.035em` inside `<span data-lines="1">` · sub `15px/1.6/#a0958a`, max-width ~380px |
+| Radii | 14–18px cards · 100px pills · 3–4px stills · 12px video tiles |
 | Motion | `cubic-bezier(.2,.7,.3,1)`, .5–.9s, stagger 60–90ms; transform + opacity only; `prefers-reduced-motion` respected |
 | Tap targets | ≥ 44px |
-| Section padding | `clamp(90px,13vh,160px) clamp(20px,5vw,90px) clamp(80px,10vh,130px)` |
 
 Fonts load from Google Fonts (the bundle also embeds woff2). Voice: first person
-singular, never "we", never the word "client", no invented metrics — only counts
-derivable from the data.
+singular, never "we", never "client" as a noun for people, no invented metrics —
+only what the profile states or what can be counted in the data.
 
-Constraints every new component must meet (they are what the reviewers checked):
-one root, scoped selectors + prefixed classes, **strict ES5** (`var`/`function`
-only), no `wheel` listeners, no `scrollTo`/`scrollIntoView`, no `100vw`, no
-`position:fixed` inside sections, `esc()` on every interpolation (Behance data is
-external input), keyboard + tap + click all open in one step, nothing hover-only.
+Constraints every new component must meet: one root, scoped selectors + prefixed
+classes, **strict ES5** (`var`/`function` only), no `wheel` listeners, no
+`scrollTo`/`scrollIntoView`, no `100vw`, no `position:fixed` inside sections,
+`esc()` on every interpolation, keyboard + tap + click all open in one step,
+nothing hover-only, video iframes only on demand.
 
 ---
 
@@ -246,13 +218,13 @@ Custom domain: add a `CNAME` file, point DNS at GitHub, enforce HTTPS.
 ## 7. Starting the new chat — paste this
 
 > Read `HANDOFF.md` fully, then §4 again. Rebuild this portfolio for **<NAME>**.
-> Their Behance: **<URL>**. Their resume is pasted below / at **<path>**. Contact:
-> **<email> / <phone> / <LinkedIn>**. Replace every Vikas-specific item in §4a–4f
-> (including the 17 client logos baked into the bundle and the tools/stack), keep
-> the design system in §5 and every constraint, rebuild with `python3 rebuild.py`,
-> verify in a real browser at 375 and 1440 (zero horizontal overflow, rows open the
-> right gallery, zero console errors), and show me the result before pushing
-> anything. Do not push without asking.
+> Their videos: **<YouTube channel / page with embeds>**. Their roles and contact:
+> **<source>**. Replace every Avinash-specific item in §4a–4e (categories, copy,
+> employers, wall, stack, generated covers), keep the design system in §5 and every
+> constraint, run `python3 render_assets.py` then `python3 rebuild.py`, verify in a
+> real browser at 375 and 1440 (zero horizontal overflow, rows open the right
+> category, videos play on click, zero console errors), and show me the result
+> before pushing anything. Do not push without asking.
 
 If the new person needs a *different* base design, export a new bundle from Claude
 Design to `source/ai-flow-source.html`; every `R` anchor will then fail (by design)

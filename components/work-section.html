@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prototype F — Editorial Monitor</title>
+<title>Section 02 — list + docked monitor (standalone preview)</title>
 
 <!-- ===== STANDALONE PREVIEW ONLY — do not paste into production ===== -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Onest:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<style>body{margin:0;background:#04060d}</style>
+<style>body{margin:0;background:#0b0908}</style>
 <!-- ===== /STANDALONE PREVIEW ONLY ===== -->
 
 <!-- ===== SECTION STYLES (paste) — the one scoped block; every selector under [data-vbwork2], every class vw2- ===== -->
 <style>
-[data-vbwork2]{position:relative;z-index:2;box-sizing:border-box;background:#04060d;overflow:clip;padding:clamp(90px,13vh,160px) clamp(20px,5vw,90px) clamp(80px,10vh,130px);font-family:'Onest',system-ui,sans-serif;color:#eaf0ff}
+[data-vbwork2]{position:relative;z-index:2;box-sizing:border-box;background:#0b0908;overflow:clip;padding:clamp(90px,13vh,160px) clamp(20px,5vw,90px) clamp(80px,10vh,130px);font-family:'Onest',system-ui,sans-serif;color:#efe9e1}
 [data-vbwork2] *,[data-vbwork2] *::before,[data-vbwork2] *::after{box-sizing:border-box}
 [data-vbwork2] button{margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
-[data-vbwork2] button:focus-visible{outline:2px solid #b6f500;outline-offset:3px}
+[data-vbwork2] button:focus-visible{outline:2px solid #ffb020;outline-offset:3px}
 [data-vbwork2] img{display:block}
 [data-vbwork2] .vw2-wrap{max-width:1400px;margin:0 auto}
 [data-vbwork2] .vw2-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -25,25 +25,25 @@
 /* ---------- header (site-wide pattern) ---------- */
 [data-vbwork2] .vw2-head{margin-bottom:0} /* the filter row's hairline is the list's top rule */
 [data-vbwork2] .vw2-head-top{display:grid;gap:16px;margin-bottom:8px}
-[data-vbwork2] .vw2-eyebrow{display:block;margin-bottom:18px;font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#b6f500}
-[data-vbwork2] .vw2-h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,3.7vw,54px);font-weight:600;line-height:1.05;letter-spacing:-.035em;color:#f6f9ff}
-[data-vbwork2] .vw2-accent{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;letter-spacing:-.01em;color:#b6f500}
-[data-vbwork2] .vw2-sub{margin:0 0 16px;max-width:380px;font-size:15px;line-height:1.6;color:#8da0c4}
+[data-vbwork2] .vw2-eyebrow{display:block;margin-bottom:18px;font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#ffb020}
+[data-vbwork2] .vw2-h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,3.7vw,54px);font-weight:600;line-height:1.05;letter-spacing:-.035em;color:#faf7f2}
+[data-vbwork2] .vw2-accent{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;letter-spacing:-.01em;color:#ffb020}
+[data-vbwork2] .vw2-sub{margin:0 0 16px;max-width:380px;font-size:15px;line-height:1.6;color:#a0958a}
 [data-vbwork2] .vw2-sub-d{display:none} /* the approved sentence talks about the monitor: only shown where the monitor exists */
 [data-vbwork2] .vw2-stats{display:flex;flex-wrap:wrap;gap:6px 0;margin:0}
 [data-vbwork2] .vw2-stats div{display:flex;align-items:baseline;gap:8px}
-[data-vbwork2] .vw2-stats div + div::before{content:"\00b7";order:-2;margin:0 6px;color:#8da0c4}
-[data-vbwork2] .vw2-stats dd{order:-1;margin:0;font:400 27px/1 'Instrument Serif',serif;font-style:italic;color:#f6f9ff}
-[data-vbwork2] .vw2-stats dt{font-size:13px;color:#8da0c4}
+[data-vbwork2] .vw2-stats div + div::before{content:"\00b7";order:-2;margin:0 6px;color:#a0958a}
+[data-vbwork2] .vw2-stats dd{order:-1;margin:0;font:400 27px/1 'Instrument Serif',serif;font-style:italic;color:#faf7f2}
+[data-vbwork2] .vw2-stats dt{font-size:13px;color:#a0958a}
 /* filters: a line of small-caps words, not chips. The active word carries a 1px lime underline. */
 [data-vbwork2] .vw2-bar{border-bottom:1px solid rgba(255,255,255,.1)}
 [data-vbwork2] .vw2-filters{display:flex;flex-wrap:wrap;align-items:baseline}
-[data-vbwork2] .vw2-filt{display:inline-flex;align-items:baseline;padding:14px 0;font-size:12.5px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:#8da0c4} /* 16 + 28 = 44px tall */
-[data-vbwork2] .vw2-filt + .vw2-filt::before{content:"\00b7";margin:0 22px;color:#8da0c4}
+[data-vbwork2] .vw2-filt{display:inline-flex;align-items:baseline;padding:14px 0;font-size:12.5px;font-weight:600;line-height:1.3;letter-spacing:.14em;text-transform:uppercase;color:#a0958a} /* 16 + 28 = 44px tall */
+[data-vbwork2] .vw2-filt + .vw2-filt::before{content:"\00b7";margin:0 22px;color:#a0958a}
 [data-vbwork2] .vw2-fl{display:inline-block;padding-bottom:5px;border-bottom:1px solid transparent}
 [data-vbwork2] .vw2-filt b{margin-left:5px;font:400 16px/1 'Instrument Serif',serif;font-style:italic;letter-spacing:0;color:inherit}
-[data-vbwork2] .vw2-filt[aria-pressed="true"]{color:#f6f9ff}
-[data-vbwork2] .vw2-filt[aria-pressed="true"] .vw2-fl{border-color:#b6f500}
+[data-vbwork2] .vw2-filt[aria-pressed="true"]{color:#faf7f2}
+[data-vbwork2] .vw2-filt[aria-pressed="true"] .vw2-fl{border-color:#ffb020}
 
 /* ---------- list: base = compact media rows (phone / tablet / short viewports) ---------- */
 [data-vbwork2] .vw2-list{list-style:none;margin:0;padding:0;transition:opacity .12s linear}
@@ -54,16 +54,16 @@
 [data-vbwork2] .vw2-row{position:relative;display:block;width:100%}
 [data-vbwork2] .vw2-row:focus-visible{outline-offset:-3px}
 [data-vbwork2] .vw2-grid{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:16px;row-gap:2px;align-items:start;min-height:88px;padding:16px 0}
-[data-vbwork2] .vw2-num{display:block;grid-column:2;grid-row:1;font:400 15px/1 'Instrument Serif',serif;font-style:italic;color:#8da0c4}
-[data-vbwork2] .vw2-thumb{position:relative;display:block;grid-column:1;grid-row:1 / span 2;width:96px;height:68px;border-radius:3px;overflow:hidden;background:#080d1a}
+[data-vbwork2] .vw2-num{display:block;grid-column:2;grid-row:1;font:400 15px/1 'Instrument Serif',serif;font-style:italic;color:#a0958a}
+[data-vbwork2] .vw2-thumb{position:relative;display:block;grid-column:1;grid-row:1 / span 2;width:96px;height:68px;border-radius:3px;overflow:hidden;background:#161210}
 [data-vbwork2] .vw2-thumb img,[data-vbwork2] .vw2-strip img{width:100%;height:100%;object-fit:cover}
 [data-vbwork2] .vw2-txt{display:block;grid-column:2;grid-row:2;min-width:0}
-[data-vbwork2] .vw2-title{display:block;font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,2vw,30px);font-weight:600;line-height:1.1;letter-spacing:-.025em;color:#f6f9ff;overflow-wrap:break-word;transition:opacity .15s ease}
-[data-vbwork2] .vw2-meta{display:block;margin-top:6px;font-size:14px;font-weight:400;line-height:1.4;color:#8da0c4}
+[data-vbwork2] .vw2-title{display:block;font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,2vw,30px);font-weight:600;line-height:1.1;letter-spacing:-.025em;color:#faf7f2;overflow-wrap:break-word;transition:opacity .15s ease}
+[data-vbwork2] .vw2-meta{display:block;margin-top:6px;font-size:14px;font-weight:400;line-height:1.4;color:#a0958a}
 [data-vbwork2] .vw2-strip{display:none}
-[data-vbwork2] .vw2-strip i{display:block;width:84px;height:52px;border-radius:3px;overflow:hidden;background:#080d1a}
+[data-vbwork2] .vw2-strip i{display:block;width:84px;height:52px;border-radius:3px;overflow:hidden;background:#161210}
 /* one arrow, not thirteen: hidden until hover / press / the row on the frame; slides flush from 6px in (never past the li's clip edge) */
-[data-vbwork2] .vw2-arrow{display:none;align-items:center;justify-content:flex-end;width:30px;height:44px;color:#f6f9ff;opacity:0;transform:translateX(-6px);transition:opacity .3s ease,transform .5s cubic-bezier(.2,.7,.3,1)}
+[data-vbwork2] .vw2-arrow{display:none;align-items:center;justify-content:flex-end;width:30px;height:44px;color:#faf7f2;opacity:0;transform:translateX(-6px);transition:opacity .3s ease,transform .5s cubic-bezier(.2,.7,.3,1)}
 [data-vbwork2] .vw2-arrow svg{width:18px;height:18px}
 /* pressed feedback (tap highlight is off, so a phone tap needs its own) */
 [data-vbwork2] .vw2-row:active .vw2-arrow{opacity:1;transform:translateX(0);transition-duration:.15s}
@@ -73,9 +73,9 @@
 [data-vbwork2] .vw2-mon{display:none}
 
 @media (hover:hover){
-  [data-vbwork2] .vw2-filt:hover{color:#f6f9ff}
+  [data-vbwork2] .vw2-filt:hover{color:#faf7f2}
   [data-vbwork2] .vw2-row:hover .vw2-arrow{opacity:1;transform:translateX(0)}
-  [data-vbwork2] .vw2-open:hover .vw2-open-t{text-decoration-color:#b6f500}
+  [data-vbwork2] .vw2-open:hover .vw2-open-t{text-decoration-color:#ffb020}
   [data-vbwork2] .vw2-open:hover svg{transform:translateX(4px)}
 }
 
@@ -105,7 +105,7 @@
 [data-vbwork2] .vw2-mon-in{position:relative}
 /* max-height keeps frame + caption inside the viewport (the still is cover-fit, so a shorter box is a tighter crop, never bands).
    Budget: caption under the frame is <= 180px (2-line title), sticky top <= 121px whenever this clamp is the limit. */
-[data-vbwork2] .vw2-viewer{position:relative;display:block;width:100%;aspect-ratio:16/9;min-height:190px;max-height:calc(100vh - 320px);border-radius:4px;overflow:hidden;background:#080d1a;box-shadow:0 50px 80px -50px rgba(0,0,0,.9)}
+[data-vbwork2] .vw2-viewer{position:relative;display:block;width:100%;aspect-ratio:16/9;min-height:190px;max-height:calc(100vh - 320px);border-radius:4px;overflow:hidden;background:#161210;box-shadow:0 50px 80px -50px rgba(0,0,0,.9)}
 /* a hairline only: one clean still, no vignette, no ambient blur */
 [data-vbwork2] .vw2-viewer::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 [data-vbwork2] .vw2-main{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
@@ -124,12 +124,12 @@
 [data-vbwork2] .vw2-cap-l.vw2-swap{animation:vw2-swap .3s cubic-bezier(.2,.7,.3,1)}
 @keyframes vw2-swap{from{opacity:0;transform:translateY(8px)}}
 [data-vbwork2] .vw2-cap-head{display:flex;align-items:baseline;gap:14px}
-[data-vbwork2] .vw2-cap-num{flex:none;font:400 clamp(26px,2.6vw,40px)/1 'Instrument Serif',serif;font-style:italic;color:#b6f500}
-[data-vbwork2] .vw2-cap-title{margin:0;min-width:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,2.6vw,40px);font-weight:600;line-height:1.08;letter-spacing:-.03em;color:#f6f9ff;overflow-wrap:break-word;text-wrap:balance}
-[data-vbwork2] .vw2-cap-meta{margin:8px 0 0;font-size:14px;font-weight:400;line-height:1.4;color:#8da0c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* one line always: the caption's bottom edge must not move between projects */
+[data-vbwork2] .vw2-cap-num{flex:none;font:400 clamp(26px,2.6vw,40px)/1 'Instrument Serif',serif;font-style:italic;color:#ffb020}
+[data-vbwork2] .vw2-cap-title{margin:0;min-width:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,2.6vw,40px);font-weight:600;line-height:1.08;letter-spacing:-.03em;color:#faf7f2;overflow-wrap:break-word;text-wrap:balance}
+[data-vbwork2] .vw2-cap-meta{margin:8px 0 0;font-size:14px;font-weight:400;line-height:1.4;color:#a0958a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* one line always: the caption's bottom edge must not move between projects */
 /* plain text link: word, hairline underline, arrow that slides */
-[data-vbwork2] .vw2-open{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;line-height:1;white-space:nowrap;color:#f6f9ff}
-[data-vbwork2] .vw2-open-t{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px;text-decoration-color:rgba(246,249,255,.35)}
+[data-vbwork2] .vw2-open{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;line-height:1;white-space:nowrap;color:#faf7f2}
+[data-vbwork2] .vw2-open-t{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px;text-decoration-color:rgba(250,247,242,.35)}
 [data-vbwork2] .vw2-open svg{flex:none;width:16px;height:16px;transition:transform .5s cubic-bezier(.2,.7,.3,1)}
 [data-vbwork2] .vw2-open:active svg{transform:translateX(4px)}
 
@@ -151,9 +151,9 @@
   [data-vbwork2] .vw2-arrow{grid-column:4;align-self:center}
   /* the playhead is the one row at full strength; the rest sit back a touch (muted text lifted so it still clears 4.5:1) */
   [data-vbwork2] .vw2-item{opacity:.85}
-  [data-vbwork2] .vw2-item:not(.vw2-on) .vw2-meta,[data-vbwork2] .vw2-item:not(.vw2-on) .vw2-num{color:#c9d5ee}
+  [data-vbwork2] .vw2-item:not(.vw2-on) .vw2-meta,[data-vbwork2] .vw2-item:not(.vw2-on) .vw2-num{color:#d3c9bd}
   [data-vbwork2] .vw2-item.vw2-on{opacity:1}
-  [data-vbwork2] .vw2-item.vw2-on .vw2-num{color:#b6f500}
+  [data-vbwork2] .vw2-item.vw2-on .vw2-num{color:#ffb020}
   [data-vbwork2] .vw2-item.vw2-on .vw2-thumb img{transform:scale(1.06)}
   [data-vbwork2] .vw2-item.vw2-on .vw2-arrow{opacity:1;transform:translateX(0)}
 }
@@ -202,14 +202,14 @@
       <div class="vw2-head-top">
         <div>
           <span class="vw2-eyebrow vw2-rv">02 — The work</span>
-          <h2 class="vw2-h2" id="vw2-h"><span data-lines="1">Everything I've made,<br>cut into one <span class="vw2-accent">sequence.</span></span></h2>
+          <h2 class="vw2-h2" id="vw2-h"><span data-lines="1">Everything I've cut,<br>in one <span class="vw2-accent">timeline.</span></span></h2>
         </div>
         <div class="vw2-head-r">
-          <p class="vw2-sub vw2-rv vw2-d1"><span class="vw2-sub-d">Scroll the list and the monitor cuts to each project. Open any one for the full set.</span><span class="vw2-sub-m">Open any project for the full set.</span></p>
+          <p class="vw2-sub vw2-rv vw2-d1"><span class="vw2-sub-d">Scroll the list and the monitor cuts to each category. Open any one to play every film in it.</span><span class="vw2-sub-m">Open any category to play every film in it.</span></p>
           <dl class="vw2-stats vw2-rv vw2-d2">
-            <div><dt>Projects</dt><dd data-vw2-n="projects"></dd></div>
-            <div><dt>Design pieces</dt><dd data-vw2-n="pieces"></dd></div>
+            <div><dt>Categories</dt><dd data-vw2-n="projects"></dd></div>
             <div><dt>Films</dt><dd data-vw2-n="films"></dd></div>
+            <div><dt>Thumbnails</dt><dd data-vw2-n="pieces"></dd></div>
           </dl>
         </div>
       </div>
@@ -257,7 +257,7 @@
   if (!root || !WORK || !WORK.length) { return; }
 
   var DESK = '(min-width: 1024px) and (min-height: 560px)';   // identical string in the CSS
-  var FEATURED = ['podcast-videos', 'social-media-designs', 'wealthy-yt-ads', 'creative-designs', 'trailer-video'];
+  var FEATURED = ['viral-shorts', 'short-form', 'ugc-videos', 'personal-branding', 'event-films'];
   var FLIP_MS = 950, INTENT_MS = 90, SETTLE_MS = 110, FOCUS_GRACE_MS = 400, HYST_PX = 14;
   var ARROW = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
 
@@ -684,6 +684,6 @@
 <!-- ===================== /SECTION (paste to here) ===================== -->
 
 <!-- STANDALONE PREVIEW ONLY: spacer so the sticky monitor can release and scroll away -->
-<div style="min-height:80vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px 0;color:#8da0c4;font:500 13px Onest,system-ui,sans-serif">preview spacer — next section</div>
+<div style="min-height:80vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px 0;color:#a0958a;font:500 13px Onest,system-ui,sans-serif">preview spacer — next section</div>
 </body>
 </html>
