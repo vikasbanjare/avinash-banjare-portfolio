@@ -658,11 +658,11 @@ ANALYTICS_SCRIPT = """
 """
 
 
-# ── colour themes: picker + live hero recolour ───────────────────────────────
+# ── colour themes: the picker ────────────────────────────────────────────────
 # palette.theme_css() defines every role variable per <html data-theme>. This
-# script picks the stored theme before first paint, builds the picker where the
-# old light-mode button sat, and re-sets the hero's shader uniforms (the one
-# place CSS variables cannot reach) whenever the theme changes.
+# script picks the stored theme before first paint and builds the picker where
+# the old light-mode button sat. Everything else re-inks through the variables;
+# the hero canvas watches the attribute and re-reads them.
 THEME_CSS = """
 <style>
 @keyframes abSpin { to { transform:rotate(360deg); } }
@@ -679,8 +679,6 @@ THEME_SCRIPT = """
 (function () {
   "use strict";
   var THEMES = __THEMES__, DEFAULT = __DEFAULT__, KEY = 'ab-palette';
-  var UNI = { uBot: 'bg', uTop: 'hero-top', uGlow: 'glow-deep', uCore: 'glow-deep', uRim: 'accent', uFill: 'hero-fill' };
-  var ORBIT = ['accent', 'glow', 'glow-2'];   // the eight orbit dots use these three roles
   var BY = {};
   THEMES.forEach(function (t) { BY[t.slug] = t; });
   function html() { return document.documentElement; }
@@ -688,38 +686,6 @@ THEME_SCRIPT = """
   var current = BY[stored()] ? stored() : DEFAULT;
   html().setAttribute('data-theme', current);
 
-  function hex2rgb(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
-  function nearestRole(hex, vars) {
-    var a = hex2rgb(hex), best = ORBIT[0], bd = 1e9, i, b, d;
-    for (i = 0; i < ORBIT.length; i++) {
-      b = hex2rgb(vars[ORBIT[i]]);
-      d = (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]) + (a[2] - b[2]) * (a[2] - b[2]);
-      if (d < bd) { bd = d; best = ORBIT[i]; }
-    }
-    return best;
-  }
-  // The scene is built with DEFAULT's colours. Uniforms are THREE.Color objects,
-  // so setting them in place is enough; orbit colours are matched by nearest role.
-  function recolorScene(prevSlug, slug) {
-    var scene = window.__abScene, P = BY[prevSlug].vars, N = BY[slug].vars;
-    if (!scene || !scene.traverse) return false;
-    scene.traverse(function (o) {
-      var u = o.material && o.material.uniforms, k;
-      if (!u) return;
-      for (k in UNI) { if (u[k] && u[k].value && u[k].value.set) u[k].value.set(N[UNI[k]]); }
-      if (u.uColor && u.uColor.value && u.uColor.value.getHexString) {
-        u.uColor.value.set(N[nearestRole('#' + u.uColor.value.getHexString(), P)]);
-      }
-    });
-    return true;
-  }
-  if (current !== DEFAULT) {
-    var tries = 0;
-    (function poll() {
-      if (recolorScene(DEFAULT, current)) return;
-      if (++tries < 200) setTimeout(poll, 100);
-    })();
-  }
   function setMeta(slug) {
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', BY[slug].vars.bg);
@@ -729,12 +695,10 @@ THEME_SCRIPT = """
   var btn = null, menu = null, items = [];
   function apply(slug) {
     if (!BY[slug] || slug === current) return;
-    var prev = current;
     current = slug;
-    html().setAttribute('data-theme', slug);
+    html().setAttribute('data-theme', slug);   // the hero canvas watches this attribute
     try { localStorage.setItem(KEY, slug); } catch (e) {}
     setMeta(slug);
-    recolorScene(prev, slug);
     refresh();
   }
   function swatch(t, size) {
@@ -834,4 +798,321 @@ PORTRAIT_HTML = """
   <span aria-hidden="true" style="position:absolute; right:-8px; top:6%; width:58px; height:58px; border-radius:18px; background:var(--accent); color:var(--on-accent); display:flex; align-items:center; justify-content:center; transform:rotate(9deg); box-shadow:0 14px 30px rgba(0,0,0,.35);"><svg width="20" height="22" viewBox="0 0 16 18" style="display:block; margin-left:3px;"><path d="M0 0l16 9L0 18z" fill="currentColor"></path></svg></span>
   <span aria-hidden="true" style="position:absolute; left:-14px; bottom:9%; display:inline-flex; align-items:center; gap:8px; padding:9px 13px; border-radius:100px; background:var(--panel); border:1px solid rgba(255,255,255,.14); transform:rotate(-6deg); font-family:'Space Grotesk',sans-serif; font-size:11px; font-weight:700; letter-spacing:.14em; color:var(--text); box-shadow:0 10px 24px rgba(0,0,0,.35);"><i class="ab-blink" style="width:8px; height:8px; border-radius:50%; background:#ff3d3d; display:inline-block;"></i>REC · 4K</span>
 </div>
+"""
+
+
+# ── hero: the edit-bay timeline ──────────────────────────────────────────────
+# Replaces the bundle's Three.js globe (rebuild.py drops the canvas host's ref,
+# so the host's _init() returns before it builds anything). A canvas-2D editing
+# timeline: two video tracks carrying his real frames tinted in the theme's
+# blue, two audio tracks with living waveforms, a ruler with timecodes and a
+# playhead that follows the cursor and flashes on every cut. Reads its colours
+# from the theme variables and re-reads them when <html data-theme> changes.
+HERO_CSS = """
+<style>
+[data-ab-hero]{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+</style>
+"""
+
+HERO_SCRIPT = """
+(function () {
+  "use strict";
+  var DATA = __HERODATA__;                 // [{t: title, c: category, s: thumb, p: portrait}]
+  var PXS = 5, RATE = 4, FPS = 25;         // px per timeline second · timeline seconds per real second · timecode fps
+  var canvas, ctx, sec, W = 0, H = 0, dpr = 1, raf = 0, running = false, visible = true, covered = false;
+  var offset = 0, last = 0, playX = 0.6, targetX = 0.6, hovering = false, flash = 0;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var C = {}, imgs = {}, cache = {};
+
+  function cssVar(n, fb) {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(n);
+    v = v && v.replace(/^\\s+|\\s+$/g, '');
+    return v || fb;
+  }
+  function readTheme() {
+    C.glow = cssVar('--glow', '#004fff'); C.glow2 = cssVar('--glow-2', '#8db3ff'); C.deep = cssVar('--glow-deep', '#0033b3');
+    C.accent = cssVar('--accent', '#4d86ff'); C.on = cssVar('--on-accent', '#04102e'); C.text = cssVar('--text', '#f2f5ff');
+    C.glowRGB = cssVar('--glow-rgb', '0,79,255'); C.textRGB = cssVar('--text-rgb', '242,245,255');
+  }
+  function hash(str) { var h = 0, i; for (i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0; return h; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function tc(t) {
+    var f = Math.floor((t % 1) * FPS), s = Math.floor(t) % 60, m = Math.floor(t / 60) % 60, h = Math.floor(t / 3600);
+    return pad(h) + ':' + pad(m) + ':' + pad(s) + ':' + pad(f);
+  }
+  function rr(x, y, w, h, r) {
+    ctx.beginPath();
+    if (w <= 0 || h <= 0) return;                 // a squeezed band must never reach arcTo with a negative radius
+    r = Math.max(0, Math.min(r, h / 2, w / 2));
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function trunc(text, max) {
+    var key = text + '|' + Math.round(max / 8);
+    if (cache[key]) return cache[key];
+    var t = text;
+    while (t.length > 2 && ctx.measureText(t).width > max) t = t.slice(0, -2);
+    if (t !== text) t = t.replace(/\\s+$/, '') + '\\u2026';
+    cache[key] = t;
+    return t;
+  }
+
+  // ── clips: V2 = vertical shorts, V1 = everything else. Widths are a hash of the title, so the reel is stable. ──
+  var tracks = { v2: [], v1: [] }, total = { v2: 0, v1: 0 };
+  function build() {
+    var i, d, w, k, gap = 6;
+    tracks.v2 = []; tracks.v1 = []; total.v2 = 0; total.v1 = 0;
+    for (i = 0; i < DATA.length; i++) {
+      d = DATA[i]; k = d.p ? 'v2' : 'v1';
+      w = d.p ? 96 + (hash(d.t) % 4) * 26 : 190 + (hash(d.t) % 5) * 58;
+      tracks[k].push({ d: d, x: total[k], w: w });
+      total[k] += w + gap;
+    }
+  }
+  function load() {
+    DATA.forEach(function (d) {
+      if (!d.s || imgs[d.s]) return;
+      var im = new Image();
+      im.decoding = 'async';
+      im.src = d.s;
+      imgs[d.s] = im;
+    });
+  }
+
+  // where the hero copy actually is, so the timeline can sit beside it (wide) or under it (stacked)
+  function fgBox() {
+    // [data-hero-fg] is a full-size wrapper; the copy is its headings, paragraphs and buttons
+    var fg = sec.querySelector('[data-hero-fg]'), b = sec.getBoundingClientRect(), right = 0, bottom = 0, els, i, r;
+    if (fg) {
+      els = fg.querySelectorAll('h1, p, a');
+      for (i = 0; i < els.length; i++) {
+        r = els[i].getBoundingClientRect();
+        if (r.width && r.height) { right = Math.max(right, r.right - b.left); bottom = Math.max(bottom, r.bottom - b.top); }
+      }
+    }
+    if (!right) { right = W * 0.46; bottom = H * 0.7; }
+    return { right: right, bottom: bottom };
+  }
+  var MODE = 'wide';
+  function layout() {
+    var fg = fgBox();
+    MODE = W >= 1024 ? 'wide' : 'stack';
+    // beside the copy on wide screens; on phones the band starts behind the CTA row (they are solid pills) and runs to the hint
+    var top = MODE === 'wide' ? Math.round(H * 0.43) : Math.round(Math.max(H * 0.5, fg.bottom - 90));
+    var bottom = H - (MODE === 'wide' ? 64 : 44), ruler = 26, avail = bottom - top - ruler - 6;
+    var rows = [], y = top + ruler + 6, gap, hV2, hV1, hA;
+    if (avail < 40) {                       // nothing sensible fits: draw only the ruler
+      avail = 0;
+    } else if (avail < 96) {                // one track: the films
+      rows.push({ k: 'v1', y: y, h: avail }); y += avail;
+    } else if (avail >= 150) {              // four tracks: shorts, films, VO, music
+      gap = Math.round(avail * 0.035);
+      hV2 = Math.round(avail * 0.23); hV1 = Math.round(avail * 0.33); hA = Math.round(avail * 0.16);
+      rows.push({ k: 'v2', y: y, h: hV2 }); y += hV2 + gap;
+      rows.push({ k: 'v1', y: y, h: hV1 }); y += hV1 + gap;
+      rows.push({ k: 'a1', y: y, h: hA }); y += hA + gap;
+      rows.push({ k: 'a2', y: y, h: hA }); y += hA;
+    } else {                                // a phone: just the two video tracks
+      gap = 6;
+      hV2 = Math.round((avail - gap) * 0.44); hV1 = Math.max(24, avail - gap - hV2);
+      rows.push({ k: 'v2', y: y, h: hV2 }); y += hV2 + gap;
+      rows.push({ k: 'v1', y: y, h: hV1 }); y += hV1;
+    }
+    // where the playhead rests: well inside the visible part of the timeline
+    var rest = MODE === 'wide' ? Math.min(0.88, fg.right / W + 0.3) : 0.5;
+    return { top: top, rulerY: top + ruler, rows: rows, bottom: y, fg: fg, rest: rest };
+  }
+
+  // cover-fit `im` into the box, crop from the centre
+  function cover(im, x, y, w, h) {
+    var iw = im.naturalWidth, ih = im.naturalHeight, s = Math.max(w / iw, h / ih), sw = w / s, sh = h / s;
+    ctx.drawImage(im, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
+  }
+  function clip(c, x, y, h) {
+    var w = c.w, im = imgs[c.d.s], tw = c.d.p ? Math.round(h * 9 / 16) : Math.min(w, Math.round(h * 16 / 9)), hasImg = im && im.complete && im.naturalWidth;
+    ctx.save();
+    rr(x, y, w, h, 7); ctx.clip();
+    var g = ctx.createLinearGradient(0, y, 0, y + h);
+    g.addColorStop(0, C.glow); g.addColorStop(1, C.deep);
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    if (hasImg) {
+      cover(im, x, y, tw, h);
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = 'rgba(' + C.glowRGB + ',.62)'; ctx.fillRect(x, y, tw, h);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.fillRect(x + tw - 1, y, 1, h);
+    } else { tw = 0; }
+    ctx.fillStyle = 'rgba(255,255,255,.34)'; ctx.fillRect(x, y, w, 1.5);
+    if (w - tw > 78 && h >= 34) {
+      ctx.fillStyle = C.text; ctx.font = '600 12px \\'Space Grotesk\\', system-ui, sans-serif'; ctx.textBaseline = 'alphabetic';
+      ctx.fillText(trunc(c.d.t, w - tw - 18), x + tw + 9, y + 18);
+      if (h >= 46) {
+        ctx.fillStyle = C.glow2; ctx.font = '600 9.5px \\'Space Grotesk\\', system-ui, sans-serif';
+        ctx.fillText(trunc(c.d.c.toUpperCase(), w - tw - 18), x + tw + 9, y + 33);
+      }
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1; rr(x + 0.5, y + 0.5, w - 1, h - 1, 7); ctx.stroke();
+  }
+  function noise(i, seed) { var x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453; return x - Math.floor(x); }
+  function wave(y, h, seed, color, alpha, px) {
+    var bw = 2, step = 3, i, x, start = Math.floor(offset / step), env, amp, n;
+    ctx.fillStyle = color; ctx.globalAlpha = alpha;
+    for (i = 0, x = -(offset % step); x < W; i++, x += step) {
+      n = start + i;
+      env = 0.3 + 0.7 * (Math.sin(n * 0.09 + seed) * 0.5 + 0.5) * (Math.sin(n * 0.023 + seed * 3) * 0.35 + 0.65);
+      amp = Math.max(2, h * 0.86 * env * (0.35 + 0.65 * noise(n, seed)));
+      if (Math.abs(x - px) < 6) amp = Math.min(h * 0.92, amp * 1.35);   // the playhead "hears" what it crosses
+      ctx.fillRect(x, y + (h - amp) / 2, bw, amp);
+    }
+    ctx.globalAlpha = 1;
+  }
+  function trackBg(y, h, label) {
+    ctx.fillStyle = 'rgba(255,255,255,.035)'; rr(-8, y, W + 16, h, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 1; rr(-8.5, y + 0.5, W + 16, h - 1, 8); ctx.stroke();
+    ctx.fillStyle = 'rgba(' + C.textRGB + ',.42)'; ctx.font = '700 10px \\'Space Grotesk\\', system-ui, sans-serif';
+    ctx.textAlign = 'right'; ctx.fillText(label, W - 14, y + 14); ctx.textAlign = 'left';
+  }
+
+  function draw(now) {
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!reduce) offset += dt * PXS * RATE;
+    var L = layout();
+    if (!hovering) targetX = L.rest;
+    playX += (targetX - playX) * (1 - Math.pow(0.002, dt));
+    var px = Math.round(W * playX) + 0.5, i, j, row, list, tot, c, x, k, seconds = offset / PXS;
+    ctx.clearRect(0, 0, W, H);
+
+    // ruler: a minute every 300px, ten seconds every 50px, timecodes at the minutes
+    ctx.strokeStyle = 'rgba(' + C.textRGB + ',.16)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, L.rulerY + 0.5); ctx.lineTo(W, L.rulerY + 0.5); ctx.stroke();
+    ctx.font = '600 10px \\'Space Grotesk\\', system-ui, sans-serif'; ctx.textBaseline = 'alphabetic';
+    var first = Math.floor(offset / 50) * 50;
+    for (x = first; x < offset + W + 50; x += 50) {
+      var sx = Math.round(x - offset) + 0.5, major = (x % 300) === 0;
+      ctx.strokeStyle = 'rgba(' + C.textRGB + (major ? ',.42)' : ',.16)');
+      ctx.beginPath(); ctx.moveTo(sx, L.rulerY - (major ? 9 : 4)); ctx.lineTo(sx, L.rulerY); ctx.stroke();
+      if (major && sx < W - 210) { ctx.fillStyle = 'rgba(' + C.textRGB + ',.5)'; ctx.fillText(tc(x / PXS), sx + 6, L.rulerY - 6); }
+      // faint grid down through the tracks
+      ctx.strokeStyle = 'rgba(' + C.textRGB + (major ? ',.07)' : ',.03)');
+      ctx.beginPath(); ctx.moveTo(sx, L.rulerY + 6); ctx.lineTo(sx, L.bottom); ctx.stroke();
+    }
+
+    // tracks
+    var cut = false;
+    for (i = 0; i < L.rows.length; i++) {
+      row = L.rows[i];
+      if (row.k === 'a1' || row.k === 'a2') {
+        trackBg(row.y, row.h, row.k === 'a1' ? 'A1 · VO' : 'A2 · MUSIC');
+        wave(row.y + 3, row.h - 6, row.k === 'a1' ? 1.7 : 4.2, row.k === 'a1' ? C.glow2 : C.glow, row.k === 'a1' ? 0.75 : 0.55, px);
+        continue;
+      }
+      trackBg(row.y, row.h, row.k === 'v2' ? 'V2 · SHORTS' : 'V1 · FILMS');
+      list = tracks[row.k]; tot = total[row.k];
+      if (!tot) continue;
+      var base = -(offset % tot);
+      for (k = 0; k < 2; k++) {
+        for (j = 0; j < list.length; j++) {
+          c = list[j]; x = Math.round(base + k * tot + c.x);
+          if (x + c.w < -4 || x > W + 4) continue;
+          clip(c, x, row.y + 3, row.h - 6);
+          if (Math.abs(x - px) < 1.6 || Math.abs(x + c.w - px) < 1.6) cut = true;
+        }
+      }
+    }
+    if (cut) flash = 1;
+
+    // playhead + timecode
+    if (flash > 0) {
+      ctx.fillStyle = 'rgba(' + C.textRGB + ',' + (0.35 * flash).toFixed(3) + ')';
+      ctx.fillRect(px - 4, L.top, 8, L.bottom - L.top);
+      flash = Math.max(0, flash - dt * 5);
+    }
+    ctx.fillStyle = C.accent;
+    ctx.fillRect(px - 1, L.top, 2, L.bottom - L.top + 6);
+    ctx.beginPath(); ctx.moveTo(px - 7, L.rulerY - 12); ctx.lineTo(px + 7, L.rulerY - 12); ctx.lineTo(px, L.rulerY - 2); ctx.closePath(); ctx.fill();
+    var label = tc(seconds), lw = 96;
+    ctx.font = '700 12.5px \\'Space Grotesk\\', system-ui, sans-serif';
+    rr(px - lw / 2, L.top - 14, lw, 26, 7); ctx.fill();
+    ctx.fillStyle = C.on; ctx.textAlign = 'center'; ctx.fillText(label, px, L.top + 4); ctx.textAlign = 'left';
+
+    // program label
+    ctx.fillStyle = 'rgba(' + C.textRGB + ',.42)'; ctx.font = '700 10px \\'Space Grotesk\\', system-ui, sans-serif';
+    ctx.textAlign = 'right'; ctx.fillText('PROGRAM · 1920×1080 · ' + FPS + ' FPS', W - 14, L.rulerY - 6); ctx.textAlign = 'left';
+  }
+
+  function frame(now) {
+    raf = 0;
+    if (!visible || covered || document.hidden) { running = false; last = 0; return; }
+    draw(now);
+    if (reduce) { running = false; return; }
+    raf = requestAnimationFrame(frame);
+    running = true;
+  }
+  function kick() { if (!raf) { running = true; raf = requestAnimationFrame(frame); } }
+  function size() {
+    W = sec.clientWidth; H = sec.clientHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cache = {};
+    // fade the timeline out from under the copy: from its right edge when beside it, from its bottom edge when under it
+    var L = layout(), mask, a, b;
+    if (MODE === 'wide') {
+      a = Math.max(0, (L.fg.right + 12) / W * 100); b = Math.min(100, a + 22);
+      mask = 'linear-gradient(90deg, rgba(0,0,0,0) ' + a.toFixed(1) + '%, #000 ' + b.toFixed(1) + '%)';
+    } else {
+      a = Math.max(0, (L.top - 30) / H * 100); b = Math.min(100, (L.top + 70) / H * 100);
+      mask = 'linear-gradient(180deg, rgba(0,0,0,0) ' + a.toFixed(1) + '%, #000 ' + b.toFixed(1) + '%)';
+    }
+    canvas.style.webkitMaskImage = mask;
+    canvas.style.maskImage = mask;
+    last = 0;
+    draw(performance.now());          // one frame right away, even in a hidden tab or under reduced motion
+  }
+
+  function start() {
+    sec = canvas.parentNode;
+    while (sec && !(sec.getAttribute && sec.getAttribute('data-hero'))) sec = sec.parentNode;
+    if (!sec) return;
+    ctx = canvas.getContext('2d');
+    readTheme(); build(); load(); size();
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { visible = es[es.length - 1].isIntersecting; if (visible) kick(); }).observe(sec);
+    }
+    // the hero is sticky: once the page has scrolled past it there is nothing to see
+    var stage = canvas.parentNode;
+    window.addEventListener('scroll', function () {
+      var pr = Math.min(1, Math.max(0, window.scrollY / Math.max(1, H)));      // like the globe: shrink and fade as 02 slides over
+      stage.style.transform = 'scale(' + (1 - pr * 0.3).toFixed(4) + ')';
+      stage.style.opacity = (1 - pr).toFixed(3);
+      var c = window.scrollY > H * 1.05;
+      if (c !== covered) { covered = c; if (!covered) kick(); }
+    }, { passive: true });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) kick(); });
+    window.addEventListener('resize', size);
+    sec.addEventListener('mousemove', function (e) {
+      var r = sec.getBoundingClientRect(), v = (e.clientX - r.left) / r.width;
+      hovering = true;
+      targetX = Math.min(0.94, Math.max(0.3, v));
+      if (reduce) { playX = targetX; draw(performance.now()); }
+    }, { passive: true });
+    sec.addEventListener('mouseleave', function () { hovering = false; if (reduce) { playX = layout().rest; draw(performance.now()); } });
+    if ('MutationObserver' in window) {
+      new MutationObserver(function () { readTheme(); cache = {}; if (reduce) draw(performance.now()); })
+        .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+    DATA.forEach(function (d) { var im = imgs[d.s]; if (im) im.onload = function () { if (!running) draw(performance.now()); }; });
+    setTimeout(size, 1200); setTimeout(size, 3200);   // the copy reveals after the loader; measure it again then
+    kick();
+  }
+  var n = 0;
+  (function poll() {
+    canvas = document.querySelector('canvas[data-ab-hero]');
+    if (canvas) { start(); return; }
+    if (++n < 200) setTimeout(poll, 100);
+  })();
+})();
 """

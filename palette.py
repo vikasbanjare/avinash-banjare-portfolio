@@ -27,7 +27,13 @@ ROLES = ("bg", "bg-2", "panel", "panel-2", "panel-3", "hero-top", "hero-fill",
 
 # Five dark themes. Every accent clears 4.5:1 on its background and every
 # on-accent clears 4.5:1 on the accent; faint labels are ~3.8:1 like the original.
+# Electric is the default: #004fff glows, a lighter #4d86ff where blue has to be read.
 THEMES = {
+    "electric": {"name": "Electric", "bg": "#05070f", "bg-2": "#080b16", "panel": "#0f1526", "panel-2": "#141b33",
+                 "panel-3": "#1e2848", "hero-top": "#0a1f6b", "hero-fill": "#12275c",
+                 "text": "#f2f5ff", "body": "#e3e9fb", "body-2": "#c3cdea", "muted": "#93a0c4", "faint": "#66728f",
+                 "accent": "#4d86ff", "accent-hover": "#7aa6ff", "on-accent": "#04102e",
+                 "glow": "#004fff", "glow-2": "#8db3ff", "glow-deep": "#0033b3", "flame": "#ff9a3d"},
     "violet": {"name": "Violet", "bg": "#0a0812", "bg-2": "#0e0b18", "panel": "#171226", "panel-2": "#1d1730",
                "panel-3": "#2a2340", "hero-top": "#1a1040", "hero-fill": "#2a1f4d",
                "text": "#f6f3ff", "body": "#ece7fa", "body-2": "#cfc6e8", "muted": "#a196bd", "faint": "#6f6688",
@@ -48,13 +54,8 @@ THEMES = {
                "text": "#faf4f2", "body": "#efe6e3", "body-2": "#d4c8c4", "muted": "#a4958f", "faint": "#756a66",
                "accent": "#ff6a4d", "accent-hover": "#ff8a72", "on-accent": "#1c0803",
                "glow": "#38d1f0", "glow-2": "#8ae6f7", "glow-deep": "#1487a3", "flame": "#ffd34d"},
-    "ocean":  {"name": "Ocean", "bg": "#070a12", "bg-2": "#0a0e18", "panel": "#111726", "panel-2": "#161d30",
-               "panel-3": "#24304f", "hero-top": "#0c1f4a", "hero-fill": "#1c2d52",
-               "text": "#f3f6ff", "body": "#e6ebf7", "body-2": "#c6cfe3", "muted": "#96a3c0", "faint": "#68748f",
-               "accent": "#4da3ff", "accent-hover": "#7dbbff", "on-accent": "#061a33",
-               "glow": "#ff8a3d", "glow-2": "#ffb27a", "glow-deep": "#c2551a", "flame": "#ffa040"},
 }
-DEFAULT = "violet"
+DEFAULT = "electric"
 
 # ── aifloh's colours → roles ────────────────────────────────────────────────
 ROLE_OF = {

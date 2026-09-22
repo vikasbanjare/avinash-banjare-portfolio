@@ -10,7 +10,9 @@ Built for Avinash Chandra Banjare (vikasbanjare.github.io/avinash-banjare-portfo
 from avinash-portfolio.super.site and his résumé (Sep 2026). As of 2026-09-22:
 12 categories, 18 films, 2 thumbnail designs, 7 roles. It descends from the
 vikas-portfolio pipeline (Behance-based); this version is YouTube-based, every
-colour is a CSS variable, and the visitor picks one of five colour themes.
+colour is a CSS variable, the visitor picks one of five colour themes (Electric,
+#004fff, is the default), and the hero is an editing-timeline canvas instead of
+the bundle's Three.js globe.
 
 ---
 
@@ -31,6 +33,7 @@ colour is a CSS variable, and the visitor picks one of five colour themes.
 | `assets/frames/<slug>-NN.jpg` | 760px stills of design categories (for the work monitor). |
 | `assets/wall/`, `assets/logos/` | Generated wordmarks (brand wall) and monograms (employer cards), white tiles. |
 | `assets/portrait.jpg` | His photo from the Super.site, cropped to the head-and-shoulders disc (490×490). Ring, tint, grain and stickers are DOM, so they follow the theme. |
+| `assets/thumbs/<id>.jpg` | 320px frames for the hero timeline's clips (`sips -Z 320` of the posters + the two thumbnail designs). |
 | `assets/icons/` | CC0 brand marks (simple-icons) for the stack row. |
 | `assets/favicon.svg`, `assets/og-card.jpg` | Amber play-mark favicon and 1200×630 share image. |
 | `.claude/launch.json` | Local preview: `python3 -m http.server 4173`. |
@@ -71,19 +74,23 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
    to `wheel`.
 6. **Removing the hero flyby is safe**: the host's `_setupWork()` returns early when
    `[data-fly-pin]` is absent. Section ids/`data-sec` keep the dot-nav working.
+   **Removing the Three.js globe is safe the same way**: `_init()` starts with
+   `if (!this.host) return`, and `this.host` only exists through the canvas host's
+   `ref="{{ hostRef }}"`. rebuild.py drops that ref, so no scene, drag handlers,
+   orbit labels or render loop are ever created; the same box holds
+   `<canvas data-ab-hero>` and `parts.HERO_SCRIPT` draws the timeline into it.
 7. **`100vw` includes the scrollbar** → 15px horizontal overflow on Windows (macOS
    overlay scrollbars hide it). Always `width:100%`.
 8. **Safari needs `-webkit-backdrop-filter`.** rebuild.py adds it in a final pass
    over the assembled template so injected markup is covered too.
-9. **Colours are hard-coded everywhere** — ~900 inline styles, a few JS style
-   assignments and the hero's shader uniforms (`uBot uTop uGlow uCore uRim uFill`
-   plus `uColor` per orbit dot, from the items' `col:`). `palette.tokenize()`
-   rewrites all of them to role variables and runs *last*, because several build
-   anchors match on the old colours. Shaders cannot read CSS, so `THREE.Color`
-   literals and `col:` get the DEFAULT theme's hex; `parts.THEME_SCRIPT` re-sets
-   those uniforms in place (`window.__abScene`, exposed by rebuild.py) when the
-   theme changes. The old light-mode toggle is gone: its button element is the
-   picker's slot, and its handler is guarded so it never binds.
+9. **Colours are hard-coded everywhere** — ~900 inline styles and a few JS style
+   assignments. `palette.tokenize()` rewrites all of them to role variables and
+   runs *last*, because several build anchors match on the old colours. The dead
+   globe code's `THREE.Color` literals get the default theme's hex (shaders cannot
+   read CSS; harmless now). The hero canvas reads the variables with
+   `getComputedStyle` and re-reads them on a `data-theme` mutation. The old
+   light-mode toggle is gone: its button element is the picker's slot, and its
+   handler is guarded so it never binds.
 10. **Testing gotchas:** background browser tabs throttle `requestAnimationFrame`,
     so scroll-linked activation and the flipbook look frozen — front the tab.
     GitHub Pages' CDN serves stale HTML for a minute after deploy — cache-bust
@@ -126,7 +133,9 @@ python3 rebuild.py && git add -A && git commit -m "…" && git push   # deploy (
 7. Gallery viewer (`GAL_UUID`, also wires launch cards `LAUNCH` and the four
    "closer look" tiles `TEAM`), Process section inserted after `#os`
    (`PROCESS_UUID`, sections 04–09 renumbered 05–10, nav link `#os` → `#process`),
-   Experience + Stack (`EXP_UUID`), optional analytics (`AN_UUID`).
+   Experience + Stack (`EXP_UUID`), optional analytics (`AN_UUID`), the hero
+   timeline (`HERO_UUID`, clips = every film + the two thumbnails, with
+   `assets/thumbs` frames; vertical Shorts on V2).
 8. Theme variable table + picker script (`THEME_UUID`), then `palette.tokenize()`
    over the template (and over every injected script as it is encoded);
    `-webkit-backdrop-filter` pass; `node --check`; write.
@@ -189,16 +198,16 @@ purpose. The portrait is a 490×490 crop (`sips -c 490 490 --cropOffset y x`).
 
 Every colour on the page is a role variable; the five themes in `palette.THEMES`
 define the roles. New components never write hex — `var(--accent)`,
-`rgba(var(--glow-rgb),.4)`. Default theme: **Violet**.
+`rgba(var(--glow-rgb),.4)`. Default theme: **Electric**.
 
-| Role | Used for | Violet · Ember · Mint · Coral · Ocean |
+| Role | Used for | Electric · Violet · Ember · Mint · Coral |
 |---|---|---|
-| `--bg` / `--bg-2` | page · menu, overlays | `#0a0812` · `#0b0908` · `#07090c` · `#0c0a0a` · `#070a12` |
+| `--bg` / `--bg-2` | page · menu, overlays | `#05070f` · `#0a0812` · `#0b0908` · `#07090c` · `#0c0a0a` |
 | `--panel` / `--panel-2` / `--panel-3` | cards, stills, hairline edges | per theme, one step lighter each |
 | `--text` / `--body` / `--body-2` | display · body · secondary body | near-white, tinted to the theme |
 | `--muted` / `--faint` | captions ≥ 6.5:1 · eyebrows ~3.8:1 (**never under 14px body copy**) | |
-| `--accent` / `--accent-hover` / `--on-accent` | ink + CTA · hover · text on the CTA | `#a58bff` · `#ffb020` · `#5cf2c2` · `#ff6a4d` · `#4da3ff` |
-| `--glow` / `--glow-2` / `--glow-deep` | wires, dots · pipeline steps · planet, section glows | `#ff4fa3` · `#1fb2a0` · `#7c5cff` · `#38d1f0` · `#ff8a3d` |
+| `--accent` / `--accent-hover` / `--on-accent` | ink + CTA · hover · text on the CTA | `#4d86ff` · `#a58bff` · `#ffb020` · `#5cf2c2` · `#ff6a4d` |
+| `--glow` / `--glow-2` / `--glow-deep` | wires, dots, timeline clips · pipeline steps · section glows | `#004fff` · `#ff4fa3` · `#1fb2a0` · `#7c5cff` · `#38d1f0` |
 | `--flame` | the LIFTOFF label | |
 | `--hero-top` / `--hero-fill` | the hero nebula's shader colours | |
 
@@ -207,7 +216,8 @@ define the roles. New components never write hex — `var(--accent)`,
 | Display type | Space Grotesk 500–700, letter-spacing −.02 to −.045em |
 | Body type | Onest 300–700 |
 | Accent type | Instrument Serif italic 400 — numerals and one accent word per heading, in `--accent` |
-| Covers (images) | Unbounded 900 uppercase, six saturated schemes cycling, icon sticker, ghost numeral, halftone dots, grain — theme-independent |
+| Covers (images) | Unbounded 900 uppercase, six saturated schemes cycling (electric blue leads), icon sticker, ghost numeral, halftone dots, grain — theme-independent |
+| Hero | Canvas-2D editing timeline: V2 shorts · V1 films · A1 VO · A2 music (two video tracks only when the band is under 150px), ruler at 5px/s with a timecode every minute, playhead follows the cursor (eased), flashes on cuts; frames tinted with `--glow` via multiply. It measures the copy (h1/p/a inside `[data-hero-fg]`) and sits beside it ≥1024px or under it below, fading out from the copy's edge via a mask set in JS; paused off-screen, hidden tab, or once scrolled past; static under reduced motion |
 | Section header | eyebrow `11.5px/600/.18em/uppercase/--accent` · h2 `clamp(30px,3.7vw,54px)/600/1.05/-.035em` inside `<span data-lines="1">` · sub `15px/1.6/--muted`, max-width ~380px |
 | Radii | 14–18px cards · 100px pills · 3–4px stills · 12px video tiles |
 | Motion | `cubic-bezier(.2,.7,.3,1)`, .5–.9s, stagger 60–90ms; transform + opacity only; `prefers-reduced-motion` respected |

@@ -34,7 +34,7 @@ GRAIN = ("url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' 
 
 # bg, bg-end, ink (type), pop (sticker + blob), ink-on-pop
 SCHEMES = [
-    ("#5b2bff", "#9a5cff", "#ffffff", "#d7ff3d", "#101400"),   # violet · lime
+    ("#004fff", "#3d7bff", "#ffffff", "#d7ff3d", "#101400"),   # electric blue · lime
     ("#ff3d6e", "#ff8a3d", "#1a0a10", "#fff3c4", "#1a0a10"),   # coral → orange · cream
     ("#c8ff3d", "#6fe03d", "#0d1400", "#5b2bff", "#ffffff"),   # lime · violet
     ("#22d3f0", "#3d7bff", "#061018", "#ff3d6e", "#ffffff"),   # cyan → blue · coral
@@ -154,8 +154,8 @@ def og_html(n_films, portrait_uri):
     bg, bg2, ink, pop, pop_ink = SCHEMES[0]
     css = f"""
 .c{{position:relative;width:1200px;height:630px;overflow:hidden;color:{ink};font-family:'Unbounded',sans-serif;
-  background:linear-gradient(135deg,#0a0812 0%,{bg} 55%,{bg2} 100%)}}
-.blob{{position:absolute;right:-160px;top:-220px;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,#ff4fa3 0%,rgba(0,0,0,0) 62%);opacity:.45}}
+  background:linear-gradient(135deg,#05070f 0%,{bg} 55%,{bg2} 100%)}}
+.blob{{position:absolute;right:-160px;top:-220px;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,#8fb4ff 0%,rgba(0,0,0,0) 62%);opacity:.4}}
 .dots{{position:absolute;left:0;bottom:0;width:60%;height:60%;opacity:.14;background-image:radial-gradient({ink} 1.6px,transparent 1.7px);background-size:22px 22px;
   -webkit-mask-image:linear-gradient(45deg,#000 20%,transparent 75%);mask-image:linear-gradient(45deg,#000 20%,transparent 75%)}}
 .grain{{position:absolute;inset:0;background-image:{GRAIN};opacity:.2;mix-blend-mode:overlay}}
@@ -175,7 +175,7 @@ def og_html(n_films, portrait_uri):
             f'<div class="ph"><img src="{portrait_uri}" alt=""><i></i></div>'
             f'<div class="stk"><svg width="44" height="50" viewBox="0 0 16 18" style="margin-left:5px"><path d="M0 0l16 9L0 18z" fill="currentColor"/></svg></div>'
             f'<div class="grain"></div></div>')
-    return doc(css, body, 1200, 630, "#0a0812")
+    return doc(css, body, 1200, 630, "#05070f")
 
 
 def to_jpeg(png, jpg, q=84):

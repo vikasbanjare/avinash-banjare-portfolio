@@ -103,6 +103,11 @@ R = [
      "and the US. Three shorts in this reel passed a million impressions each — one of them 17.7 million."),
     ("Start a project →", "See the work →"),
     (">See the work<", ">Get in touch<"),
+    ('<span style="width:13px; height:13px; border:1px solid currentColor; border-radius:3px; display:inline-block;"></span>Drag to explore</span>',
+     '<span style="width:13px; height:13px; border:1px solid currentColor; border-radius:3px; display:inline-block;"></span>Hover to scrub</span>'),
+    # the hint wrapped into three lines on phones; keep it on one, and drop "hover" where there is no hover
+    ('gap:18px; font-size:12px; font-weight:500; letter-spacing:.04em; color:#6f7f9e; text-transform:uppercase; animation:aifFloat',
+     'gap:18px; white-space:nowrap; font-size:12px; font-weight:500; letter-spacing:.04em; color:#6f7f9e; text-transform:uppercase; animation:aifFloat'),
     (">Start a project<", ">Get in touch<"),
 
     # ── nav + CTAs ──
@@ -342,9 +347,13 @@ assert n == 1, "hero h1 close not found"
 m = re.search(r'<button data-chrome="theme-btn".*?</button>', tpl, re.S)
 assert m, "theme button not found"
 tpl = tpl[:m.start()] + '<div data-ab-picker style="position:relative; display:flex;"></div>' + tpl[m.end():]
-# the hero keeps its scene on the React instance; expose it so the theme script can re-set the shader colours
-assert tpl.count("this._scene = scene;") == 1, "scene handle drifted"
-tpl = tpl.replace("this._scene = scene;", "this._scene = scene; window.__abScene = scene;")
+# The Three.js globe is retired: without the host ref, the component's _init()
+# returns before it builds a scene, binds drag handlers or starts its loop. The
+# same box now holds the timeline canvas (parts.HERO_SCRIPT draws into it).
+HOST = '<div ref="{{ hostRef }}" style="position:absolute; inset:0; z-index:1;"></div>'
+assert tpl.count(HOST) == 1, "hero canvas host drifted"
+tpl = tpl.replace(HOST, '<div data-ab-stage style="position:absolute; inset:0; z-index:1;">'
+                        '<canvas data-ab-hero aria-hidden="true"></canvas></div>')
 
 # 1c-ter. His portrait opens the About column (anchor is the eyebrow R just renamed).
 m = re.search(r'(<div style="display:flex; flex-direction:column; gap:22px;">)(\s*<span[^>]*>07 — About</span>)', tpl)
@@ -745,6 +754,13 @@ add_js(PROCESS_UUID, parts.PROCESS_SCRIPT.replace(
 tpl = tpl.replace(head_anchor, head_anchor + f'\n<script src="{PROCESS_UUID}"></script>', 1)
 tpl = tpl.replace("</head>", parts.PROCESS_CSS + "</head>", 1)
 
+# touch screens cannot hover: hide that half of the hero hint (label + its separator)
+m = re.search(r'(<span style="display:flex; align-items:center; gap:7px;">)(<span style="width:13px;[^>]*></span>Hover to scrub</span>)(\s*<span style="opacity:\.4;">·</span>)', tpl)
+assert m, "hero hint markup drifted"
+tpl = (tpl[:m.start()] + '<span data-ab-hint="hover" style="display:flex; align-items:center; gap:7px;">' + m.group(2)
+       + m.group(3).replace('<span style="opacity:.4;">', '<span data-ab-hint="sep" style="opacity:.4;">') + tpl[m.end():])
+tpl = tpl.replace("</head>", '<style>@media (pointer:coarse){[data-ab-hint]{display:none !important;}}</style></head>', 1)
+
 # the nav's second entry pointed at the node graph; it now reads "Process"
 assert '<a href="#os"' in tpl, "nav link to #os missing"
 tpl = tpl.replace('<a href="#os"', '<a href="#process"', 1)
@@ -816,6 +832,24 @@ add_js(THEME_UUID, parts.THEME_SCRIPT
        .replace("__DEFAULT__", json.dumps(palette.DEFAULT)))
 tpl = tpl.replace(head_anchor, head_anchor + f'\n<script src="{THEME_UUID}"></script>', 1)
 
+# 5g. Hero timeline: every film (and the two thumbnails) as a clip, with its
+#     320px frame from assets/thumbs; vertical Shorts go on the upper track.
+HERO = []
+for p in projects:
+    for vid in p["videos"]:
+        m_ = p.get("meta", {}).get(vid, {})
+        thumb = f"assets/thumbs/{vid}.jpg"
+        HERO.append({"t": m_.get("title", p["title"]), "c": p["title"],
+                     "s": thumb if (ROOT / thumb).exists() else "", "p": bool(m_.get("portrait"))})
+    for i, cap in enumerate(p.get("captions", []), 1):
+        thumb = f"assets/thumbs/thumb-{i:02d}.jpg"
+        if (ROOT / thumb).exists():
+            HERO.append({"t": cap.split(" — ")[0], "c": p["title"], "s": thumb, "p": False})
+HERO_UUID = "7b3d9e21-4a6c-4f58-b2d1-8e5c0a7f3d96"
+add_js(HERO_UUID, parts.HERO_SCRIPT.replace("__HERODATA__", json.dumps(HERO, separators=(",", ":"))))
+tpl = tpl.replace(head_anchor, head_anchor + f'\n<script src="{HERO_UUID}"></script>', 1)
+tpl = tpl.replace("</head>", parts.HERO_CSS + "</head>", 1)
+
 # ── 6. palette: every remaining aifloh colour becomes a theme variable ───────
 # Runs after every anchor above (several of them match on the old colours).
 # Three.js literals get the default theme's real hex; THEME_SCRIPT re-sets them live.
@@ -850,7 +884,7 @@ out = out.replace("<title>Bundled Page</title>", f"<title>{PAGE_TITLE}</title>")
 # silently as a dead section. Fail the build instead.
 if shutil.which("node"):
     import tempfile
-    for uid in (GAL_UUID, WORK_UUID, PROCESS_UUID, EXP_UUID, THEME_UUID):
+    for uid in (GAL_UUID, WORK_UUID, PROCESS_UUID, EXP_UUID, THEME_UUID, HERO_UUID):
         src = base64.b64decode(manifest[uid]["data"]).decode()
         with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
             fh.write(src)
@@ -873,5 +907,6 @@ print(f"  social links wired : {wired}")
 print(f"  wall tiles         : {len(parts.WALL)} brands over 3 tracks ({[len(r) for r in _rows]}), was 17")
 print(f"  brand marks inlined: {real_marks}/{sum(len(r) for _, r in stack_payload)}")
 print(f"  reel               : {len(projects)} categories · {N_VID} films · {N_IMG} thumbnails")
+print(f"  hero timeline      : {len(HERO)} clips ({sum(1 for h in HERO if h['p'])} vertical)")
 if leftovers:
     print("  ⚠ leftover placeholder text:", leftovers)
